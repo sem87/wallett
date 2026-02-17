@@ -1,10 +1,14 @@
+# Telegram Bot Framework
+aiogram>=3.0.0
 
-# Установить pip    sudo apt update   sudo apt upgrade   sudo apt install python3-pip   pip3 --version
-# pip install aiogram
-# pip install google-auth
-# pip install google-auth-oauthlib
-# pip install google-api-python-client
-# pip install python-dotenv
+# Google API & Authentication
+google-api-python-client
+google-auth
+google-auth-oauthlib
 
-# pip install dashscope
-# pip install huggingface_hub
+# Environment Variables
+python-dotenv
+
+# AI Models & APIs
+dashscope
+huggingface_hub

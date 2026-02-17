@@ -1,9 +1,9 @@
-koshelek-bot/                     # Корневая папка проекта
+wallett/                     # Корневая папка проекта
 ├── .env                          # Переменные окружения (не коммитить!)
 ├── .env.example                  # Пример .env для команды
 ├── .gitignore
 ├── requirements.txt
-├── Dockerfile                    # (опционально)
+├── Dockerfile                    #
 ├── docker-compose.yml            # (опционально)
 ├── main.py                       # Точка входа (запуск бота)
 │
@@ -14,7 +14,7 @@ koshelek-bot/                     # Корневая папка проекта
 ├── handlers/                     # Обработчики событий
 │   ├── __init__.py
 │   ├── start.py                  # /start и базовые команды
-│   ├── wallet.py                 # Логика кошелька (ваш "Koshelek")
+│   ├── wallet.py                 #
 │   └── transactions.py           # Транзакции, переводы и т.д.
 │
 ├── kbds/                    # Клавиатуры
