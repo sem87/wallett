@@ -1,0 +1,43 @@
+koshelek-bot/                     # Корневая папка проекта
+├── .env                          # Переменные окружения (не коммитить!)
+├── .env.example                  # Пример .env для команды
+├── .gitignore
+├── requirements.txt
+├── Dockerfile                    # (опционально)
+├── docker-compose.yml            # (опционально)
+├── main.py                       # Точка входа (запуск бота)
+│
+├── config/                       # Конфигурация
+│   ├── __init__.py
+│   └── settings.py               # Загрузка .env, настройки бота
+│
+├── handlers/                     # Обработчики событий
+│   ├── __init__.py
+│   ├── start.py                  # /start и базовые команды
+│   ├── wallet.py                 # Логика кошелька (ваш "Koshelek")
+│   └── transactions.py           # Транзакции, переводы и т.д.
+│
+├── kbds/                    # Клавиатуры
+│   ├── __init__.py
+│   ├── reply.py                  # Reply-клавиатуры
+│   └── inline.py                 # Inline-клавиатуры
+│
+├── filters/                      # Кастомные фильтры (опционально)
+│   └── __init__.py
+│
+├── middlewares/                  # Middleware (опционально)
+│   └── __init__.py
+│
+├── services/                     # Бизнес-логика
+│   ├── __init__.py
+│   ├── wallet_service.py         # Работа с кошельком
+│   └── notification_service.py   # Уведомления
+│
+├── database/                     # Работа с БД
+│   ├── __init__.py
+│   ├── models.py                 # SQLAlchemy/ Tortoise модели
+│   └── repository.py             # CRUD-операции
+│
+└── utils/                        # Вспомогательные функции
+    ├── __init__.py
+    └── helpers.py

@@ -4,17 +4,13 @@ import asyncio
 import random
 from datetime import datetime, timedelta
 from dotenv import find_dotenv, load_dotenv
+
+
 from googleteable import *
 from googleteable2table import *
 from kbds import inlinebtn, reply
 
-"""КОМАНДЫ ДЛЯ СЕРВЕРА"""
-# Установить pip    sudo apt update   sudo apt upgrade   sudo apt install python3-pip   pip3 --version
-# pip install aiogram
-# pip install google-auth
-# pip install google-auth-oauthlib
-# pip install google-api-python-client
-# pip install python-dotenv
+
 """СТОРОННИЕ СЕРВИСЫ"""
 """___  ДАННЫЕ.ВХОДНЫЕ ПАРАМЕТРЫ  ___"""
 load_dotenv(".env.wallet")
@@ -73,7 +69,7 @@ async def start_cmd(message: types.Message):
 """СЛУШАЕТ НАЖАТИЕ КНОПОК КЕЙБОРД"""
 
 
-@dp.message(F.text == "Выручка ГНОМ")
+@dp.message(F.text == "финансы")
 async def reply_btn(message: types.Message):
     itogo = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!H1")
     bn = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!J1")
@@ -122,24 +118,13 @@ async def reply_btn(message: types.Message):
     )
 
 
-@dp.message(F.text == "Запас ГЕЛИЯ")
+@dp.message(F.text == "terminator")
 async def reply_btn(message: types.Message):
-    gel_gnom = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!M1")
-    gel_shardom = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!O1")
-    await message.answer("ОСТАТОК Гелия ГНОМ : " + gel_gnom[0])
-    await message.answer(" ШарДом : " + gel_shardom[0])
-    if int(gel_gnom[0]) < 60:
-        await message.answer("ХОЗЯИН НЕ ДОВОДИ ДО БЕДЫ!!!КУПИ ГЕЛИЙ В ГНОМ")
-        await message.answer("😡")
-    elif int(gel_gnom[0]) < 120:
-        await message.answer("В ГНОМ срочно нужен гелий!!!" + "😎")
-    elif int(gel_shardom[0]) < 60:
-        await message.answer("ХОЗЯИН БЕДА! КУПИ ГЕЛИЙ В ШАРДОМ")
-        await message.answer("😡")
-    elif int(gel_shardom[0]) < 120:
-        await message.answer("В ГНОМ срочно нужен гелий!!!" + "😎")
-    else:
-        await message.answer("ВСЕ ОК.МОЖНО ПОРАБОТАТЬ!!!")
+    # gel_gnom = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!M1")
+    # await message.answer("ОСТАТОК Гелия ГНОМ : " + gel_gnom[0])
+    await message.answer("нужно строить логику terminator", reply_markup=inlinebtn.terminator_variety())
+
+
 
 
 @dp.message(F.text == "ДДС")
@@ -684,42 +669,6 @@ async def reply_btn(message: types.Message):
         await message.answer("🤯")
     else:
         await message.answer("С НАЛОГОМ ВСЕ ПОД КОНТРОЛЕМ!")
-
-
-@dp.message(F.text == "ПОГОДА")
-async def reply_btn(message: types.Message):
-    chislo = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!P54")
-    await message.answer(chislo[0])
-    sostoanie = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!Q54")
-    veter = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!T54")
-    await message.answer(sostoanie[0] + " , " + veter[0])
-    max_t = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!R54")
-    min_t = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!S54")
-    await message.answer("ТЕМПЕРАТУРА :\nот " + max_t[0] + " С до " + min_t[0] + " С")
-    osadki = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!U54")
-    sneg = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!V54")
-    vlaznost = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!Z54")
-    await message.answer(
-        "ОСАДКИ В ЖИДКОМ ВИДЕ : "
-        + osadki[0]
-        + "\nСНЕГ : "
-        + sneg[0]
-        + "\nОТНОСИТ ВЛАЖН : "
-        + vlaznost[0]
-        + " %"
-    )
-    max_p = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!X54")
-    min_p = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!Y54")
-    await message.answer("ДАВЛЕНИЕ : от " + max_p[0] + " до " + min_p[0])
-    gm_aktivnost = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!AB54")
-    kp_index = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!AC54")
-    await message.answer(
-        "ГЕО МАГНИТНАЯ АКТИВНОСТЬ : "
-        + gm_aktivnost[0]
-        + "\nК\П ИНДЕКС : "
-        + kp_index[0],
-        reply_markup=inlinebtn.pogoda_vivod(),
-    )
 
 
 @dp.message(F.text == "ПОСЕЩЕНИЕ")
@@ -1412,11 +1361,11 @@ async def process_callback_button(callback_query: types.CallbackQuery):
 """ВЫВОД О ПОГОДЕ"""
 
 
-@dp.callback_query(lambda callback_query: callback_query.data == "pogoda_vivodi")
+@dp.callback_query(lambda callback_query: callback_query.data == "result_day")
 async def process_callback_button(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    vivod = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!AD54")
-    await bot.send_message(callback_query.from_user.id, text=vivod[0])
+    # vivod = Read(Nazvanie_operazii="ЧИТАЕМ ", range="Данные!AD54")
+    await bot.send_message(callback_query.from_user.id, text="Сдесь текст результатов за день")
 
 
 """ПОСЕЩЕНИЕ ПОДРОБНО"""
