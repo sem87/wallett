@@ -54,5 +54,5 @@ if __name__ == "__main__":
         pass
         # logger.info("🛑 Бот остановлен вручную")
     except Exception as e:
-        pass
+        print("это ветка master")
         # logger.exception(f"❌ Критическая ошибка: {e}")
