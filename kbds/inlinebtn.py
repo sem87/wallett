@@ -15,12 +15,19 @@ def terminator_variety():
 
 def lightning():
     keyboard_builder = InlineKeyboardBuilder()
-    keyboard_builder.button(text="итого день", callback_data="result_day")
     keyboard_builder.button(text="итого месяц", callback_data="result_month")
     keyboard_builder.button(text="win_rate", callback_data="win_rate")
-    keyboard_builder.button(text="резерв1", callback_data="rez1")
     keyboard_builder.button(text="резерв2", callback_data="rez2")
-    keyboard_builder.adjust(2, 2, 1)
+    keyboard_builder.adjust(2, 1)
+    return keyboard_builder.as_markup()
+
+
+def basic_btn():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="итого месяц", callback_data="result_month_basic")
+    keyboard_builder.button(text="win_rate", callback_data="win_rate_basic")
+    keyboard_builder.button(text="резерв2", callback_data="rez2")
+    keyboard_builder.adjust(2, 1)
     return keyboard_builder.as_markup()
 
 
@@ -28,6 +35,33 @@ def management_btn():
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(text="рандом", callback_data="random")
     keyboard_builder.button(text="резерв1", callback_data="rez1")
+    keyboard_builder.button(text="резерв2", callback_data="rez2")
+    keyboard_builder.adjust(1, 1, 1)
+    return keyboard_builder.as_markup()
+
+
+def dds_btn_detail():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="Входящий поток подробно", callback_data="incoming_flow_details")
+    keyboard_builder.button(text="Исходящий поток подробно", callback_data="outgoing_flow_details")
+    keyboard_builder.button(text="резерв2", callback_data="rez2")
+    keyboard_builder.adjust(1, 1, 1)
+    return keyboard_builder.as_markup()
+
+
+def pnl_btn_detail():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="Доходы подробно", callback_data="income_details")
+    keyboard_builder.button(text="Расходы подробно", callback_data="expenses_detail")
+    keyboard_builder.button(text="резерв2", callback_data="rez2")
+    keyboard_builder.adjust(1, 1, 1)
+    return keyboard_builder.as_markup()
+
+
+def balance_btn_detail():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="резерв2", callback_data="rez2")
+    keyboard_builder.button(text="резерв2", callback_data="rez2")
     keyboard_builder.button(text="резерв2", callback_data="rez2")
     keyboard_builder.adjust(1, 1, 1)
     return keyboard_builder.as_markup()

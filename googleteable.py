@@ -12,10 +12,16 @@ from googleapiclient.errors import HttpError
 # from io import BytesIO
 # from PIL import Image
 
-
+#   ----------------НАЧАЛО КОНСТАНТЫ БИЗНЕС ЛОГИКИ-------------------------
+# Маппинг месяца → буква столбца в Google Таблице (январь = B, февраль = C, ...)
+MONTH_TO_COLUMN = {1: "B", 2: "C", 3: "D", 4: "E", 5: "F", 6: "G", 7: "H", 8: "I", 9: "J", 10: "K", 11: "L", 12: "M"}
+DATA_TO_MONTH = {"2026-01": 2, "2026-02": 3, "2026-03": 4, "2026-04": 5, "2026-05": 6, "2026-06": 7, "2026-07": 8,
+                 "2026-08": 9, "2026-09": 10, "2026-10": 11, "2026-11": 12, "2026-12": 13}
 # SAMPLE_RANGE_NAME = "Как продавать на 77000!A1:E250"  # НАЗВАНИЕ ЛИСТА И ДИАПОЗОН
 load_dotenv(".env.wallet")
 spreadsheet = os.getenv("spreadsheet")
+
+
 class GoogleSheet:
     SPREADSHEET_ID = spreadsheet  # АЙ ДИ ТАБЛИЦИ
     SCOPES = [
@@ -218,6 +224,42 @@ class GoogleSheet:
             spreadsheetId=self.SPREADSHEET_ID, range=range
         ).execute()
 
+    def _get_sheet_id(self, sheet_name: str) -> int:
+        """Получает числовой ID листа по его названию"""
+        spreadsheet_data = self.service.spreadsheets().get(
+            spreadsheetId=self.SPREADSHEET_ID
+        ).execute()
+
+        for sheet in spreadsheet_data.get("sheets", []):
+            if sheet["properties"]["title"] == sheet_name:
+                return sheet["properties"]["sheetId"]
+
+        raise ValueError(f"❌ Лист '{sheet_name}' не найден в таблице")
+
+    def delete_row(self, sheet_name: str, row_index: int):
+        """Удаляет всю строку из Google Таблицы.
+        :param sheet_name: Название листа (например, "Лист1")
+        :param row_index: Номер строки (1-based, т.е. первая строка = 1)"""
+        sheet_id = self._get_sheet_id(sheet_name)
+        body = {
+            "requests": [
+                {
+                    "deleteDimension": {
+                        "range": {
+                            "sheetId": sheet_id,
+                            "dimension": "ROWS",
+                            "startIndex": row_index - 1,  # API использует 0-based индекс
+                            "endIndex": row_index  # endIndex не включается
+                        }
+                    }
+                }
+            ]
+        }
+        self.service.spreadsheets().batchUpdate(
+            spreadsheetId=self.SPREADSHEET_ID,
+            body=body
+        ).execute()
+
 
 """___________________КОНЕЦ_______________________"""
 
@@ -274,6 +316,11 @@ def Read_massiv_colums(Nazvanie_operazii, range):
 def Delete_diapoz(diapozon_dannich):
     """УДАЛЕНИЕ В ЗАДАННОМ ДИАПАЗОНЕ (СВ-ВО В ЗАДАННОМ ДИАПАЗОНЕ ОСТАЕТСЯ)"""
     GoogleSheet().Delete(range=diapozon_dannich)
+
+
+def Delete_row(sheet_name, row_index):
+    """Удаляет всю строку из Google Таблицы."""
+    GoogleSheet().delete_row(sheet_name, row_index)
 
 
 if __name__ == "__main__":

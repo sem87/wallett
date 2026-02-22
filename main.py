@@ -12,7 +12,6 @@ from aiogram.fsm.storage.memory import MemoryStorage  # или RedisStorage
 
 # свои модули
 from googleteable import *
-from googleteable2table import *
 # from kbds import inlinebtn, reply
 # from handlers import start
 from handlers.start import router as start_router

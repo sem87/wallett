@@ -6,26 +6,14 @@ from aiogram.fsm.context import FSMContext  # если понадобится с
 from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
 from utils import is_admin
 from wallett.logi import logi
+from wallett.googleteable import *
+from datetime import datetime, timedelta
+from wallett.databazesql import databaze_sql_term
 
 callback_router = Router()
 
 
 # ---------------------НАЧАЛО КНОПОК ДЛЯ молнии-----------------
-@callback_router.callback_query(F.data == "result_day")
-async def process_result_day(callback: CallbackQuery, state: FSMContext):
-    """РЕЗУЛЬТАТЫ ЗА ДЕНЬ"""
-    try:
-        if not is_admin(callback.from_user.id):
-            await callback.message.delete()
-            return
-        # ✅ Правильное подтверждение нажатия кнопки
-        await callback.answer("Загружаю данные за день...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
-        await callback.message.answer("🔵🔵🔵")
-    except Exception as e:
-        logi.err.info(f"process_result_day() в папке handlers/callbackdata , Exception as e : {e}")
-
-
 @callback_router.callback_query(F.data == "result_month")
 async def process_result_month(callback: CallbackQuery, state: FSMContext):
     """РЕЗУЛЬТАТЫ ЗА МЕСЯЦ"""
@@ -33,10 +21,27 @@ async def process_result_month(callback: CallbackQuery, state: FSMContext):
         if not is_admin(callback.from_user.id):
             await callback.message.delete()
             return
-        # ✅ Правильное подтверждение нажатия кнопки
+        # Правильное подтверждение нажатия кнопки
         await callback.answer("Загружаю данные за месяц...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
-        await callback.message.answer("🔵🔵🔵")
+        # Отправка сообщения через callback.bot
+        # Определяем текущий месяц и букву столбца
+        month = datetime.now().month
+        column = MONTH_TO_COLUMN.get(month)
+        if not column:
+            logi.err.info(f"process_result_month() неизвестный месяц handlers/callbackdata ")
+            return
+        # Читаем данные из таблицы
+        try:
+            result_month = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}12")[0]
+        except Exception as e:
+            logi.err.info(f"process_result_month() ошибка ДДС,PNL handlers/callbackdata , Exception as e : {e}")
+            return
+        if int(result_month) > 0:
+            await callback.message.answer(f"🏋️нужно побороть инфляцию")
+            await callback.message.answer(f"молния за месяц : {result_month}")
+        else:
+            await callback.message.answer(f"🩸🩸🩸ОЧЕНЬ ПЛОХАЯ ТОРГОВЛЯ🩸🩸🩸")
+            await callback.message.answer(f"молния за месяц : {result_month}")
     except Exception as e:
         logi.err.info(f"process_result_month() в папке handlers/callbackdata , Exception as e : {e}")
 
@@ -48,27 +53,15 @@ async def process_result_win_rate(callback: CallbackQuery, state: FSMContext):
         if not is_admin(callback.from_user.id):
             await callback.message.delete()
             return
-        # ✅ Правильное подтверждение нажатия кнопки
+        # Правильное подтверждение нажатия кнопки
         await callback.answer("Загружаю win_rate...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
-        await callback.message.answer("🔵🔵🔵")
+        # Отправка сообщения через callback.bot
+        win_rate_sum = Read(Nazvanie_operazii="", range=f"молния!Q2")[0]
+        calculated_risk = Read(Nazvanie_operazii="", range=f"молния!P2")[0]
+        await callback.message.answer(f"win_rate за все время : {win_rate_sum}")
+        await callback.message.answer(f"расчетный риск : {calculated_risk}")
     except Exception as e:
         logi.err.info(f"process_result_win_rate() в папке handlers/callbackdata , Exception as e : {e}")
-
-
-@callback_router.callback_query(F.data == "rez1")
-async def process_result_rez1(callback: CallbackQuery, state: FSMContext):
-    """rez1"""
-    try:
-        if not is_admin(callback.from_user.id):
-            await callback.message.delete()
-            return
-        # ✅ Правильное подтверждение нажатия кнопки
-        await callback.answer("Загружаю rez1...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
-        await callback.message.answer("🔵🔵🔵")
-    except Exception as e:
-        logi.err.info(f"process_result_rez1() в папке handlers/callbackdata , Exception as e : {e}")
 
 
 @callback_router.callback_query(F.data == "rez2")
@@ -86,10 +79,60 @@ async def process_result_rez2(callback: CallbackQuery, state: FSMContext):
         logi.err.info(f"process_result_rez2() в папке handlers/callbackdata , Exception as e : {e}")
 
 
-# ---------------------КОНЕЦ КНОПОК ДЛЯ молнии-----------------
+# ---------------------КОНЕЦ КНОПОК ДЛЯ молнии---------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ основной------------
+@callback_router.callback_query(F.data == "result_month_basic")
+async def process_result_month_basic(callback: CallbackQuery, state: FSMContext):
+    """РЕЗУЛЬТАТЫ ЗА МЕСЯЦ"""
+    try:
+        if not is_admin(callback.from_user.id):
+            await callback.message.delete()
+            return
+        # Правильное подтверждение нажатия кнопки
+        await callback.answer("Загружаю данные за месяц...", show_alert=False)
+        # Отправка сообщения через callback.bot
+        # Определяем текущий месяц и букву столбца
+        month = datetime.now().month
+        column = MONTH_TO_COLUMN.get(month)
+        if not column:
+            logi.err.info(f"process_result_month_basic() неизвестный месяц handlers/callbackdata ")
+            return
+        # Читаем данные из таблицы
+        try:
+            result_month = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}13")[0]
+        except Exception as e:
+            logi.err.info(f"process_result_month_basic() ошибка ДДС,PNL handlers/callbackdata , Exception as e : {e}")
+            return
+        if int(result_month) > 0:
+            await callback.message.answer(f"🏋️нужно побороть инфляцию")
+            await callback.message.answer(f"основной за месяц : {result_month}")
+        else:
+            await callback.message.answer(f"🩸🩸🩸ОЧЕНЬ ПЛОХАЯ ТОРГОВЛЯ🩸🩸🩸")
+            await callback.message.answer(f"основной за месяц : {result_month}")
+    except Exception as e:
+        logi.err.info(f"process_result_month_basic() в папке handlers/callbackdata , Exception as e : {e}")
 
 
-# ---------------------НАЧАЛО КНОПОК ДЛЯ terminator-----------------
+@callback_router.callback_query(F.data == "win_rate_basic")
+async def process_result_win_rate_basic(callback: CallbackQuery, state: FSMContext):
+    """win_rate"""
+    try:
+        if not is_admin(callback.from_user.id):
+            await callback.message.delete()
+            return
+        # Правильное подтверждение нажатия кнопки
+        await callback.answer("Загружаю win_rate...", show_alert=False)
+        # Отправка сообщения через callback.bot
+        win_rate_sum = Read(Nazvanie_operazii="", range=f"основной!Q2")[0]
+        calculated_risk = Read(Nazvanie_operazii="", range=f"основной!P2")[0]
+        await callback.message.answer(f"win_rate за все время : {win_rate_sum}")
+        await callback.message.answer(f"расчетный риск : {calculated_risk}")
+    except Exception as e:
+        logi.err.info(f"process_result_win_rate_basic() в папке handlers/callbackdata , Exception as e : {e}")
+
+
+# ---------------------КОНЕЦ КНОПОК ДЛЯ основной-------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ terminator----------
 @callback_router.callback_query(F.data == "result_day_terminator")
 async def result_day_terminator_def(callback: CallbackQuery, state: FSMContext):
     """РЕЗУЛЬТАТЫ ЗА ДЕНЬ"""
@@ -97,10 +140,17 @@ async def result_day_terminator_def(callback: CallbackQuery, state: FSMContext):
         if not is_admin(callback.from_user.id):
             await callback.message.delete()
             return
-        # ✅ Правильное подтверждение нажатия кнопки
+        # Правильное подтверждение нажатия кнопки
         await callback.answer("terminator за день...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
-        await callback.message.answer("🔵🔵🔵")
+        # Отправка сообщения через callback.bot
+        await callback.message.answer("РЕЗУЛЬТАТЫ ЗА ДЕНЬ")
+        rows_day = databaze_sql_term.total_trade_by_day()
+        for row_day in rows_day:
+            await callback.message.answer(
+                f"🖊️Дата - {row_day['sale_date']}\n"
+                f"Итого : {round(row_day['total_net'], 1)} р\n"
+                f"📊Процент : {row_day['total_percent']}%\n"
+            )
     except Exception as e:
         logi.err.info(f"result_day_terminator_def() в папке handlers/callbackdata , Exception as e : {e}")
 
@@ -112,10 +162,23 @@ async def result_month_terminator_def(callback: CallbackQuery, state: FSMContext
         if not is_admin(callback.from_user.id):
             await callback.message.delete()
             return
-        # ✅ Правильное подтверждение нажатия кнопки
+        # Правильное подтверждение нажатия кнопки
         await callback.answer("terminator за месяц...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
-        await callback.message.answer("🔵🔵🔵")
+        # Отправка сообщения через callback.bot
+        await callback.message.answer("РЕЗУЛЬТАТЫ ЗА МЕСЯЦ")
+        rows_month = databaze_sql_term.total_trade_by_moth()
+        for row_month in rows_month:
+            await callback.message.answer(
+                f"🖊️Дата - {row_month['sale_month']}\n"
+                f"Итого : {round(row_month['total_net'], 1)} р\n"
+                f"🤝Количество сделок : {row_month['deals_count']}шт\n")
+            strok = DATA_TO_MONTH[row_month['sale_month']]
+            Izmenenie(Nazvanie_operazii="", diapozon_dannich=f"terminator!A{strok}:C{strok}",
+                      znachenie=[[row_month['sale_month'], round(row_month['total_net'], 1), row_month['deals_count']]])
+
+
+
+
     except Exception as e:
         logi.err.info(f"result_month_terminator_def() в папке handlers/callbackdata , Exception as e : {e}")
 
@@ -127,9 +190,10 @@ async def win_rate_terminator_def(callback: CallbackQuery, state: FSMContext):
         if not is_admin(callback.from_user.id):
             await callback.message.delete()
             return
-        # ✅ Правильное подтверждение нажатия кнопки
+        # Правильное подтверждение нажатия кнопки
         await callback.answer("Загружаю win_rate...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
+        # Отправка сообщения через callback.bot
+        await callback.message.answer("win_rate")
         await callback.message.answer("🔵🔵🔵")
     except Exception as e:
         logi.err.info(f"win_rate_terminator_def() в папке handlers/callbackdata , Exception as e : {e}")
@@ -142,10 +206,17 @@ async def briefcase_def(callback: CallbackQuery, state: FSMContext):
         if not is_admin(callback.from_user.id):
             await callback.message.delete()
             return
-        # ✅ Правильное подтверждение нажатия кнопки
+        # Правильное подтверждение нажатия кнопки
         await callback.answer("ЧТО В ПОРТФЕЛЕ...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
-        await callback.message.answer("🔵🔵🔵")
+        # Отправка сообщения через callback.bot
+        await callback.message.answer("ЧТО В ПОРТФЕЛЕ")
+        rows_briefcase = databaze_sql_term.what_in_briefcase()
+        for row_briefcase in rows_briefcase:
+            await callback.message.answer(
+                f"📝Тикер - {row_briefcase['tiker']}\n"
+                f"Кол-во : {row_briefcase['quantity_buy']} шт\n"
+                f"Цена покупки : {row_briefcase['buy_price']}р\n"
+            )
     except Exception as e:
         logi.err.info(f"briefcase_def() в папке handlers/callbackdata , Exception as e : {e}")
 
@@ -163,6 +234,8 @@ async def process_result_rez_terminator(callback: CallbackQuery, state: FSMConte
         await callback.message.answer("🔵🔵🔵")
     except Exception as e:
         logi.err.info(f"process_result_rez_terminator() в папке handlers/callbackdata , Exception as e : {e}")
+
+
 # ---------------------КОНЕЦ КНОПОК ДЛЯ terminator-----------------
 # ---------------------НАЧАЛО КНОПОК ДЛЯ УПРАВЛЕНИЕ-----------------
 @callback_router.callback_query(F.data == "random")
@@ -178,4 +251,132 @@ async def process_management(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("🔵🔵🔵")
     except Exception as e:
         logi.err.info(f"process_management() в папке handlers/callbackdata , Exception as e : {e}")
+
+
 # ---------------------КОНЕЦ КНОПОК ДЛЯ УПРАВЛЕНИЕ-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ ДДС-----------------
+@callback_router.callback_query(F.data == "incoming_flow_details")
+async def dds_btn_incoming_flow_details(callback: CallbackQuery, state: FSMContext):
+    """Входящий поток подробно"""
+    try:
+        if not is_admin(callback.from_user.id):
+            await callback.message.delete()
+            return
+        # ✅ Правильное подтверждение нажатия кнопки
+        await callback.answer("Загружаю входящий поток подробно...", show_alert=False)
+        await callback.message.answer("🔜Входящий поток подробно : ")
+        # Определяем текущий месяц и букву столбца
+        month = datetime.now().month
+        column = MONTH_TO_COLUMN.get(month)
+        if not column:
+            logi.err.info(f"dds_btn_incoming_flow_details() неизвестный месяц handlers/callbackdata ")
+            return
+        # Читаем данные из таблицы
+        try:
+            dds_zarplata = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}5")[0]
+            dds_prochee = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}6")[0]
+            dds_terminator = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}11")[0]
+            dds_molnia = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}12")[0]
+            dds_osnovnoi = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}13")[0]
+        except Exception as e:
+            logi.err.info(f"pnl_btn() ошибка чтения таблицы ДДС,PNL handlers/handler_message.py , Exception as e : {e}")
+            return
+        # ✅ Отправка сообщения через callback.bot
+        await callback.message.answer(
+            f"Зарплата : {dds_zarplata}\n"
+            f"Прочее : {dds_prochee}\n"
+            f"➖➖➖➖➖➖➖➖➖➖➖\n"
+            f"terminator : {dds_terminator}\n"
+            f"молния : {dds_molnia}\n"
+            f"основной : {dds_osnovnoi}\n")
+    except Exception as e:
+        logi.err.info(f"dds_btn_incoming_flow_details() в папке handlers/callbackdata , Exception as e : {e}")
+
+
+@callback_router.callback_query(F.data == "outgoing_flow_details")
+async def dds_btn_outgoing_flow_details(callback: CallbackQuery, state: FSMContext):
+    """Исходящий поток подробно"""
+    try:
+        if not is_admin(callback.from_user.id):
+            await callback.message.delete()
+            return
+        # ✅ Правильное подтверждение нажатия кнопки
+        await callback.answer("Загружаю исходящий поток подробно...", show_alert=False)
+        await callback.message.answer("🔙Исходящий поток подробно : ")
+        # Определяем текущий месяц и букву столбца
+        month = datetime.now().month
+        column = MONTH_TO_COLUMN.get(month)
+        if not column:
+            logi.err.info(f"dds_btn_outgoing_flow_details() неизвестный месяц handlers/callbackdata ")
+            return
+        # Читаем данные из таблицы
+        try:
+            dds_avtomobil_zapchasti = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}20")[0]
+            dds_azs = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}21")[0]
+            dds_apteka = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}22")[0]
+            dds_zkh = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}23")[0]
+            dds_ippoteka = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}24")[0]
+            dds_manikur_strizka = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}25")[0]
+            dds_marketplase = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}26")[0]
+            dds_obrazovanie_schkola = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}27")[0]
+            dds_produkti_rinok = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}28")[0]
+            dds_prochee_rashod = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}29")[0]
+            dds_rezerv_biznes = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}30")[0]
+            dds_supermarket = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}31")[0]
+            dds_trenirovka = Read(Nazvanie_operazii="", range=f"ДДС,PNL!{column}32")[0]
+
+        except Exception as e:
+            logi.err.info(
+                f"dds_btn_outgoing_flow_details() ошибка чтения таблицы ДДС,PNL handlers/handler_message.py , Exception as e : {e}")
+            return
+        # ✅ Отправка сообщения через callback.bot
+        await callback.message.answer(
+            f"автомобиль запчасти : {dds_avtomobil_zapchasti}\n"
+            f"азс : {dds_azs}\n"
+            f"аптека : {dds_apteka}\n"
+            f"жкх : {dds_zkh}\n"
+            f"ипотека : {dds_ippoteka}\n"
+            f"маникюр стрижки : {dds_manikur_strizka}\n"
+            f"маркетплейсы : {dds_marketplase}\n"
+            f"образование школа : {dds_obrazovanie_schkola}\n"
+            f"продукты рынок : {dds_produkti_rinok}\n"
+            f"прочее : {dds_prochee_rashod}\n"
+            f"резерв бизнес : {dds_rezerv_biznes}\n"
+            f"супермаркет : {dds_supermarket}\n"
+            f"тренировка : {dds_trenirovka}\n"
+        )
+    except Exception as e:
+        logi.err.info(f"dds_btn_outgoing_flow_details() в папке handlers/callbackdata , Exception as e : {e}")
+
+
+# ---------------------КОНЕЦ КНОПОК ДЛЯ ДДС-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ PNL-----------------
+@callback_router.callback_query(F.data == "income_details")
+async def pnl_btn_income_details(callback: CallbackQuery, state: FSMContext):
+    """Доходы подробно"""
+    try:
+        if not is_admin(callback.from_user.id):
+            await callback.message.delete()
+            return
+        # ✅ Правильное подтверждение нажатия кнопки
+        await callback.answer("Загружаю доходы подробно...", show_alert=False)
+        await callback.message.answer("Доходы подробно : ")
+        await callback.message.answer("ПОЯВИТСЯ БИЗНЕС ИЛИ ПЕРЕМЕННЫЕ РАСХОДЫ ДОБАВИЩЬ ЛОГИКУ")
+    except Exception as e:
+        logi.err.info(f"pnl_btn_income_details() в папке handlers/callbackdata , Exception as e : {e}")
+
+
+@callback_router.callback_query(F.data == "expenses_detail")
+async def pnl_btn_expenses_detail(callback: CallbackQuery, state: FSMContext):
+    """Расходы подробно"""
+    try:
+        if not is_admin(callback.from_user.id):
+            await callback.message.delete()
+            return
+        # ✅ Правильное подтверждение нажатия кнопки
+        await callback.answer("Загружаю расходы подробно...", show_alert=False)
+        await callback.message.answer("Расходы подробно : ")
+        await callback.message.answer("ПОЯВИТСЯ БИЗНЕС ИЛИ ПЕРЕМЕННЫЕ РАСХОДЫ ДОБАВИЩЬ ЛОГИКУ")
+    except Exception as e:
+        logi.err.info(f"pnl_btn_expenses_detail() в папке handlers/callbackdata , Exception as e : {e}")
+# ---------------------КОНЕЦ КНОПОК ДЛЯ PNL-----------------
