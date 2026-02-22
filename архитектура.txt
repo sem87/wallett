@@ -38,6 +38,6 @@ wallett/                     # Корневая папка проекта
 │   ├── models.py                 # SQLAlchemy/ Tortoise модели
 │   └── repository.py             # CRUD-операции
 │
-└── utils/                        # Вспомогательные функции
+└── utils/                        # Вспомогательные
     ├── __init__.py
     └── helpers.py
