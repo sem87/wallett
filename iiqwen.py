@@ -1,6 +1,3 @@
-import os
-from dotenv import load_dotenv
-import dashscope
 from huggingface_hub import InferenceClient
 import os
 from dotenv import load_dotenv
@@ -32,6 +29,5 @@ def intelligence_def(text: str, client: InferenceClient) -> str:
 
 
 if __name__ == "__main__":
-    # ...
     intelligence = "сегодня заседание ЦБ по ставки.какую ставку выберут? Это не иир"
     print(intelligence_def(text=intelligence,client=client))

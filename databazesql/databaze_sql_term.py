@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text, func, cast, Date, and_
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import MetaData, Table, select, text
+from sqlalchemy import MetaData, Table, select
 from pathlib import Path
 import os
 from datetime import datetime, timedelta
@@ -11,32 +11,18 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env.wallet")
 db_path_str = os.getenv('DB_PATH')
 path_database = Path(__file__).resolve().parent.parent.parent
 # Получаем относительный путь из .env
-# Соединяем через оператор /
+# через оператор /
 db_path = path_database / db_path_str
 db_path = db_path.resolve()  # Превращаем в абсолютный для надежности
-# print(db_path)  # C:\ПРОГРАММЫ\КОДЫ РОБОТОВ\Код РОБОТОВ\terminator\sql_terminator.db
-# Используем ОБЫЧНЫЙ движок (sqlite:/// а не sqlite+aiosqlite:///)
 DATABASE_URL = f"sqlite:///{db_path}"
 engine = create_engine(DATABASE_URL, echo=False)
 metadata = MetaData()
-# создадим нужные таблици
+# создадим нужные таблицы
 buyinform_table = Table('buyinform', metadata, autoload_with=engine)
 mytrade_results_table = Table('mytrade_results', metadata, autoload_with=engine)
 what_in_briefcase_table = Table('buyinform', metadata, autoload_with=engine)
 # Создаем сессию и делаем запрос
 SessionLocal = sessionmaker(bind=engine)
-
-
-# with SessionLocal() as session:
-#     # Строим запрос
-#     stmt = select(buyinform_table)
-#     result = session.execute(stmt)
-#     # Получаем данные
-#     rows = result.mappings().all()
-#     print(f"📊 Найдено записей: {len(rows)}")
-#     for row in rows[:5]:  # Выводим первые 5 для проверки
-#         print(row)
-# print("------------------------------------")
 
 
 def total_trade_by_day(days=8):
