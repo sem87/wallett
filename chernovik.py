@@ -1,2 +1,2 @@
 def new(a=5):
-    return a * a
+    return a * a-a
