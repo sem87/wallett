@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext  # если понадобится состояние
 from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
-from utils import is_admin
+from wallett.utils import is_admin
 from wallett.logi import logi
 from wallett.googleteable import *
 from datetime import datetime, timedelta

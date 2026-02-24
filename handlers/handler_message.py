@@ -6,7 +6,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart
 from wallett.kbds import inlinebtn  # убедитесь, что путь верный почему то ошибка в IDE
-from utils import is_admin
+from wallett.utils import is_admin
 import os
 from wallett.googleteable import *
 from datetime import datetime, timedelta

@@ -4,7 +4,7 @@ from aiogram.types import Message
 from aiogram.filters import CommandStart
 from wallett.kbds.reply import start_kb
 from wallett.logi import logi
-from utils import is_admin
+from wallett.utils import is_admin
 import os
 
 router = Router()  # ← создаём роутер
