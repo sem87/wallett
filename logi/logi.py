@@ -5,7 +5,7 @@ from pathlib import Path
 
 # Создаем папку для логов
 Path("logi/info").mkdir(exist_ok=True)
-
+# нужно что то предпринимать с путем
 
 def info_bot():
     logger = logging.getLogger("для справки")
