@@ -1,0 +1,9 @@
+name: Demo Sem
+on: workflow_dispatch
+jobs:
+  print_sem:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print to console
+      run: echo hi hhihiihihihihihh
+      
