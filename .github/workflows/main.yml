@@ -5,4 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print to console
-        run: echo привет семен!!!!!!
+        run: echo hi sem
+      - name: ppppppp
+        run: |
+          echo first
+          echo second
