@@ -1,14 +1,11 @@
 # Telegram Bot Framework
-aiogram>=3.0.0
-
+aiogram>=3.4.1
 # Google API & Authentication
-google-api-python-client
-google-auth
-google-auth-oauthlib
-
+google-api-python-client == 2.121.0
+google-auth == 2.28.2
+google-auth-oauthlib == 1.2.0
 # Environment Variables
-python-dotenv
-
+python-dotenv == 1.0.1
 # AI Models & APIs
-dashscope
-huggingface_hub
+dashscope ==  1.25.12
+huggingface_hub == 1.4.1
