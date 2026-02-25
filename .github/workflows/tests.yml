@@ -32,7 +32,7 @@ jobs:
           python -m pip install --upgrade pip
           # Если есть requirements.txt, раскомментируйте строку ниже:
           pip install -r requirements.txt
-          pip install pytest  # Обязательно устанавливаем pytest для тестов
+          # pip install pytest  # Обязательно устанавливаем pytest для тестов
 
       # Шаг 4: Запуск тестов
       - name: 🚀 Run tests with pytest
