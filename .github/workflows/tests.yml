@@ -1,0 +1,40 @@
+name: 🧪 Python Tests
+
+# 1. Триггеры: когда запускать этот workflow
+on:
+  push:
+    branches:
+      - main          # Запуск при пуше в ветку main
+  pull_request:
+    branches:
+      - main          # Запуск при создании PR в main (для проверки до слияния)
+
+# 2. Задания (Jobs)
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Используем последнюю версию Ubuntu на серверах GitHub
+
+    # 3. Пошаговое выполнение
+    steps:
+      # Шаг 1: Скачивание кода вашего репозитория
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Установка версии Python
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'  # Укажите вашу версию Python
+
+      # Шаг 3: Установка зависимостей
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Если есть requirements.txt, раскомментируйте строку ниже:
+          pip install -r requirements.txt
+          pip install pytest  # Обязательно устанавливаем pytest для тестов
+
+      # Шаг 4: Запуск тестов
+      - name: 🚀 Run tests with pytest
+        run: |
+          pytest -v  # Флаг -v показывает подробный вывод по каждому тесту
