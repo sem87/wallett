@@ -27,4 +27,3 @@ if __name__ == "__main__":
         logi.err.info("РОБОТ ОСТАНОВЛЕН В РУЧНУЮ")
     except Exception as e:
         logi.err.info(f"main , Exception as e : {e}")
-
