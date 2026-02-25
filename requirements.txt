@@ -9,3 +9,4 @@ python-dotenv == 1.0.1
 # AI Models & APIs
 dashscope ==  1.25.12
 huggingface_hub == 1.4.1
+pytest == 9.0.2
