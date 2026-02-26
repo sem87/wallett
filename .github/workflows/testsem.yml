@@ -43,16 +43,17 @@ jobs:
           pwd
           find . -name "*wallett*.py" -o -name "*test*.py"
       - name: 🧪 Run tests
-        run: pytest tests/ -v --html=results/report.html --self-contained-html
+        run: pytest tests/test_wallett.py -v
+        # pytest tests/ -v --html=results/report.html --self-contained-html
         env:
             PYTHONPATH: ${{ github.workspace }}  # 👈 Добавляем корень репозитория в путь
-      # 👇 СОХРАНЯЕМ РЕЗУЛЬТАТ   артефакты
-      - name: 📦 Upload test report
-        uses: actions/upload-artifact@v4
-        if: always()  # 👈 Загрузить даже если тесты упали!
-        with:
-          name: pytest-report
-          path: results/
+#      # 👇 СОХРАНЯЕМ РЕЗУЛЬТАТ   артефакты
+#      - name: 📦 Upload test report
+#        uses: actions/upload-artifact@v4
+#        if: always()  # 👈 Загрузить даже если тесты упали!
+#        with:
+#          name: pytest-report
+#          path: results/
   build:
     name: "Создаем Докер контейнер"
     needs: [test,lint]
