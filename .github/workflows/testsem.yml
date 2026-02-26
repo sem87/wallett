@@ -2,12 +2,14 @@ name: Test Sem
 
 on:
   push:
-    branches:[main]
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      -name: print pwd
-      run: pwd
+      - name: print pwd
+        run: pwd
+      - name: print
+        run: echo "hello"
 
