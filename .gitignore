@@ -72,6 +72,3 @@ SEM.session
 *.swo
 .DS_Store
 Thumbs.db
-
-# === Docker (если используете) ===
-.dockerignore

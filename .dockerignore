@@ -1,0 +1,23 @@
+# необходимости мои
+.env.wallet
+env.wallet
+credentials.json
+token.pickle
+error_bot.log
+info_bot.log
+.github/
+.github/workflows
+.git
+.gitignore
+# по шаблону
+.env*
+*.env
+.env.marat
+.git
+__pycache__/
+*.pyc
+venv/
+MAR.session
+.env.wallet
+logi/
+logi/info
