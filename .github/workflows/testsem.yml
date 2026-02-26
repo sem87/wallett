@@ -28,6 +28,11 @@ jobs:
           ls -la
           cd tests
           ls -la
+      # 🔍 Отладочный шаг - удалите после нахождения файла
+      - name:  Find test file
+        run: |
+          pwd
+          find . -name "*wallett*.py" -o -name "*test*.py"
       - name: 🧪 Run tests
-        run: pytest test_wallett.py -v
+        run: pytest tests/test_wallett.py -v
 
