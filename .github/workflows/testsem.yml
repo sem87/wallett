@@ -10,7 +10,8 @@ jobs:
     steps:
       - name: print pwd
         run: pwd
-      - name: |
+      - name: cd and print in parent
+        run: |
           cd ..
           pwd
           ls -la
