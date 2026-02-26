@@ -35,4 +35,6 @@ jobs:
           find . -name "*wallett*.py" -o -name "*test*.py"
       - name: 🧪 Run tests
         run: pytest tests/test_wallett.py -v
+        env:
+            PYTHONPATH: ${{ github.workspace }}  # 👈 Добавляем корень репозитория в путь
 
