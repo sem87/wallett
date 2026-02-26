@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: print pwd
         run: pwd
-      - name: print
-        run: echo "hello"
-
+      - name: cd ..
+        run: cd ..
+      - name: print pwd
+        run: pwd
