@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  best:
+  test:
     name: "Скачаем зависимости и Запуск тестов"
     runs-on: ubuntu-latest
     steps:
@@ -38,4 +38,11 @@ jobs:
         run: pytest tests/test_wallett.py -v
         env:
             PYTHONPATH: ${{ github.workspace }}  # 👈 Добавляем корень репозитория в путь
-
+  build:
+    name: "Создаем Докер контейнер"
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      # Шаг 1: создаем Докер
+      - name: создаем Докер
+        uses: echo "создаем Докер"
