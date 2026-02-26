@@ -1,0 +1,13 @@
+name: Test Sem
+
+on:
+  push:
+    branches:[main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      -name: print pwd
+      run: pwd
+
