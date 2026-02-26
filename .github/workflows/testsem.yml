@@ -1,7 +1,7 @@
 name: Test Sem
 
 on:
-  push:
+  workflow_dispatch:
     branches: [main]
 
 jobs:
@@ -46,6 +46,13 @@ jobs:
         run: pytest tests/test_wallett.py -v
         env:
             PYTHONPATH: ${{ github.workspace }}  # 👈 Добавляем корень репозитория в путь
+      # 👇 СОХРАНЯЕМ РЕЗУЛЬТАТ   артефакты
+      - name: 📦 Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()  # 👈 Загрузить даже если тесты упали!
+        with:
+          name: pytest-report
+          path: results/
   build:
     name: "Создаем Докер контейнер"
     needs: [test,lint]
