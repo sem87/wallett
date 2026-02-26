@@ -27,5 +27,7 @@ jobs:
           pwd
           ls -la
           cd tests
-          python test_wallett.py
+          ls -la
+      - name: 🧪 Run tests
+        run: pytest test_wallett.py -v
 

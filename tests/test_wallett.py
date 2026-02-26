@@ -1,5 +1,5 @@
 import pytest
-from wallett.chernovik import new, func_plus  # Импортируем обе функции
+from wallett.chernovik import *  # Импортируем обе функции
 
 
 class TestChernovik:
