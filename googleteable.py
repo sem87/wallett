@@ -18,7 +18,8 @@ MONTH_TO_COLUMN = {1: "B", 2: "C", 3: "D", 4: "E", 5: "F", 6: "G", 7: "H", 8: "I
 DATA_TO_MONTH = {"2026-01": 2, "2026-02": 3, "2026-03": 4, "2026-04": 5, "2026-05": 6, "2026-06": 7, "2026-07": 8,
                  "2026-08": 9, "2026-09": 10, "2026-10": 11, "2026-11": 12, "2026-12": 13}
 # SAMPLE_RANGE_NAME = "Как продавать на 77000!A1:E250"  # НАЗВАНИЕ ЛИСТА И ДИАПОЗОН
-load_dotenv(".env.wallet")
+if os.path.exists(".env.wallet"):
+    load_dotenv(".env.wallet")
 spreadsheet = os.getenv("spreadsheet")
 
 

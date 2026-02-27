@@ -134,7 +134,5 @@ tmp/
 temp/
 logs/
 *.log
-logi/
-logi/info
 error_bot.log
 info_bot.log

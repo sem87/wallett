@@ -3,12 +3,12 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext  # если понадобится состояние
-from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
-from wallett.utils import is_admin
-from wallett.logi import logi
-from wallett.googleteable import *
+# from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
+from utils import is_admin
+from logi import logi
+from googleteable import *
 from datetime import datetime, timedelta
-from wallett.databazesql import databaze_sql_term
+from databazesql import databaze_sql_term
 
 callback_router = Router()
 
@@ -144,13 +144,13 @@ async def result_day_terminator_def(callback: CallbackQuery, state: FSMContext):
         await callback.answer("terminator за день...", show_alert=False)
         # Отправка сообщения через callback.bot
         await callback.message.answer("РЕЗУЛЬТАТЫ ЗА ДЕНЬ")
-        rows_day = databaze_sql_term.total_trade_by_day()
-        for row_day in rows_day:
-            await callback.message.answer(
-                f"🖊️Дата - {row_day['sale_date']}\n"
-                f"Итого : {round(row_day['total_net'], 1)} р\n"
-                f"📊Процент : {row_day['total_percent']}%\n"
-            )
+        # rows_day = databaze_sql_term.total_trade_by_day()
+        # for row_day in rows_day:
+        #     await callback.message.answer(
+        #         f"🖊️Дата - {row_day['sale_date']}\n"
+        #         f"Итого : {round(row_day['total_net'], 1)} р\n"
+        #         f"📊Процент : {row_day['total_percent']}%\n"
+        #     )
     except Exception as e:
         logi.err.info(f"result_day_terminator_def() в папке handlers/callbackdata , Exception as e : {e}")
 
@@ -166,19 +166,15 @@ async def result_month_terminator_def(callback: CallbackQuery, state: FSMContext
         await callback.answer("terminator за месяц...", show_alert=False)
         # Отправка сообщения через callback.bot
         await callback.message.answer("РЕЗУЛЬТАТЫ ЗА МЕСЯЦ")
-        rows_month = databaze_sql_term.total_trade_by_moth()
-        for row_month in rows_month:
-            await callback.message.answer(
-                f"🖊️Дата - {row_month['sale_month']}\n"
-                f"Итого : {round(row_month['total_net'], 1)} р\n"
-                f"🤝Количество сделок : {row_month['deals_count']}шт\n")
-            strok = DATA_TO_MONTH[row_month['sale_month']]
-            Izmenenie(Nazvanie_operazii="", diapozon_dannich=f"terminator!A{strok}:C{strok}",
-                      znachenie=[[row_month['sale_month'], round(row_month['total_net'], 1), row_month['deals_count']]])
-
-
-
-
+        # rows_month = databaze_sql_term.total_trade_by_moth()
+        # for row_month in rows_month:
+        #     await callback.message.answer(
+        #         f"🖊️Дата - {row_month['sale_month']}\n"
+        #         f"Итого : {round(row_month['total_net'], 1)} р\n"
+        #         f"🤝Количество сделок : {row_month['deals_count']}шт\n")
+        #     strok = DATA_TO_MONTH[row_month['sale_month']]
+        #     Izmenenie(Nazvanie_operazii="", diapozon_dannich=f"terminator!A{strok}:C{strok}",
+        #               znachenie=[[row_month['sale_month'], round(row_month['total_net'], 1), row_month['deals_count']]])
     except Exception as e:
         logi.err.info(f"result_month_terminator_def() в папке handlers/callbackdata , Exception as e : {e}")
 
@@ -210,13 +206,13 @@ async def briefcase_def(callback: CallbackQuery, state: FSMContext):
         await callback.answer("ЧТО В ПОРТФЕЛЕ...", show_alert=False)
         # Отправка сообщения через callback.bot
         await callback.message.answer("ЧТО В ПОРТФЕЛЕ")
-        rows_briefcase = databaze_sql_term.what_in_briefcase()
-        for row_briefcase in rows_briefcase:
-            await callback.message.answer(
-                f"📝Тикер - {row_briefcase['tiker']}\n"
-                f"Кол-во : {row_briefcase['quantity_buy']} шт\n"
-                f"Цена покупки : {row_briefcase['buy_price']}р\n"
-            )
+        # rows_briefcase = databaze_sql_term.what_in_briefcase()
+        # for row_briefcase in rows_briefcase:
+        #     await callback.message.answer(
+        #         f"📝Тикер - {row_briefcase['tiker']}\n"
+        #         f"Кол-во : {row_briefcase['quantity_buy']} шт\n"
+        #         f"Цена покупки : {row_briefcase['buy_price']}р\n"
+        #     )
     except Exception as e:
         logi.err.info(f"briefcase_def() в папке handlers/callbackdata , Exception as e : {e}")
 

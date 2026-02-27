@@ -1,7 +1,7 @@
 from huggingface_hub import InferenceClient
 import os
 from dotenv import load_dotenv
-from wallett.logi import logi
+from logi import logi
 load_dotenv('.env.wallet')
 # Устанавливаем API-ключ (хранится в переменной окружения)
 api_key = os.getenv("deepii")

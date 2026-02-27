@@ -1,12 +1,14 @@
 from aiogram import Bot, Dispatcher
 import asyncio
-from wallett.googleteable import *
-from wallett.handlers.start import router as start_router
-from wallett.handlers.handler_message import handler_message_router as h_m_router
-from wallett.handlers import callbackdata
-from wallett.logi import logi
+from googleteable import *
+from handlers.start import router as start_router
+from handlers.handler_message import handler_message_router as h_m_router
+from handlers import callbackdata
+from logi import logi
 
-load_dotenv(".env.wallet")
+# Загружаем .env только если файл существует (локально)
+if os.path.exists(".env.wallet"):
+    load_dotenv(".env.wallet")
 bot = Bot(os.getenv("TOKEN"))
 dp = Dispatcher()
 my_admins_list = os.getenv("my_admins")

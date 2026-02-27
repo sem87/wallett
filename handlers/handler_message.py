@@ -5,16 +5,16 @@ from aiogram import Router, F, types
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart
-from wallett.kbds import inlinebtn  # убедитесь, что путь верный почему то ошибка в IDE
-from wallett.utils import is_admin
+from kbds import inlinebtn  # убедитесь, что путь верный почему то ошибка в IDE
+from utils import is_admin
 import os
-from wallett.googleteable import *
+from googleteable import *
 from datetime import datetime, timedelta
-from wallett.logi import logi
-from wallett.states import UserData  # ← Чистый и понятный импорт
-from wallett.pydant import pydantic_models
-from wallett.iiqwen import *
-from wallett.databazesql import databaze_sql_term
+from logi import logi
+from states import UserData  # ← Чистый и понятный импорт
+from pydant import pydantic_models
+from iiqwen import *
+# from databazesql import databaze_sql_term
 
 handler_message_router = Router()
 
