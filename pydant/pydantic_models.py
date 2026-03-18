@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta
-from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator, ValidationError, computed_field
 from typing import Any
+
+from pydantic import BaseModel, field_validator
 
 
 # from typing import Optional
@@ -13,13 +13,13 @@ class Lightning(BaseModel):
     price: float | None = None
     conclusion: str
 
-    @field_validator('tiker', mode='before')
+    @field_validator("tiker", mode="before")
     def tiker_light(cls, tik):
         if not tik or not tik.strip():
             raise ValueError("Тикер не может быть пустым")
         return tik.strip().upper()
 
-    @field_validator('action', mode='before')
+    @field_validator("action", mode="before")
     @classmethod
     def normalize_action(cls, v: Any) -> str:
         """Нормализует действие: приводит к единому формату
@@ -29,43 +29,43 @@ class Lightning(BaseModel):
         Применяется: strip(), lower(), маппинг синонимов"""
         # Защита от None и нестроковых значений
         if v is None:
-            v = 'покупка'
+            v = "покупка"
         # Приведение к строке и нормализация
         normalized = str(v).strip().lower()
         # Маппинг синонимов покупки
-        buy_aliases = {'', 'b', 'buy', 'покупка', 'купить', 'куплю'}
+        buy_aliases = {"", "b", "buy", "покупка", "купить", "куплю"}
         # Маппинг синонимов продажи
-        sell_aliases = {'s', 'sell', 'продажа', 'продать', 'продам'}
+        sell_aliases = {"s", "sell", "продажа", "продать", "продам"}
         if normalized in buy_aliases:
-            return 'покупка'
+            return "покупка"
         elif normalized in sell_aliases:
-            return 'продажа'
+            return "продажа"
         else:
             raise ValueError(f"Некорректное значение'{v}'.Варианты: {', '.join(sorted(buy_aliases | sell_aliases))}")
 
-    @field_validator('quantity', mode='before')
+    @field_validator("quantity", mode="before")
     def quantity_light(cls, v):
         if v is None or v == "":
             return None
         if isinstance(v, str):
-            v = v.strip().replace(' ', '')
-            if not v.isdigit() and not (v.startswith('-') and v[1:].isdigit()):
+            v = v.strip().replace(" ", "")
+            if not v.isdigit() and not (v.startswith("-") and v[1:].isdigit()):
                 raise ValueError("Количество должно быть целым числом")
         return int(v)
 
-    @field_validator('price', mode='before')
+    @field_validator("price", mode="before")
     def price_light(cls, v):
         if v is None or v == "":
             return None
         if isinstance(v, str):
-            v = v.strip().replace(' ', '').replace(',', '.')  # ← Ключевое исправление для запятой!
+            v = v.strip().replace(" ", "").replace(",", ".")  # ← Ключевое исправление для запятой!
             try:
                 return float(v)
-            except ValueError:
-                raise ValueError("Цена должна быть числом (разделитель — точка или запятая)")
+            except ValueError as e:
+                raise ValueError("Цена должна быть числом (разделитель — точка или запятая)") from e
         return float(v)
 
-    @field_validator('conclusion', mode='before')
+    @field_validator("conclusion", mode="before")
     @classmethod
     def normalize_conclusion(cls, v: Any) -> str:
         """Нормализует вывод/заключение"""
@@ -74,24 +74,34 @@ class Lightning(BaseModel):
         # Первая буква в верхний регистр, остальные остаются как есть (уже в lower)
         text = text[0].upper() + text[1:] if len(text) > 1 else text.upper()
         # Добавление точки в конце (без дублирования)
-        if not text.endswith('.'):
-            text += '.'
+        if not text.endswith("."):
+            text += "."
         return text
 
 
 class StartIndication(BaseModel):
     text: str
 
-    @field_validator('text', mode='before')
+    @field_validator("text", mode="before")
     def start_indication(cls, v: Any) -> str:
         """Нормализует вывод/заключение: удаляет переносы строк, схлопывает множественные пробелы"""
-        text = ' '.join(str(v).split()).lower()
+        text = " ".join(str(v).split()).lower()
         # Первая буква в верхний регистр
-        if text:
-            text = text[0].upper() + text[1:]
-        else:
-            text = ''  # пустая строка остаётся пустой
-            # Добавление точки в конце (без дублирования)
-        if not text.endswith('.'):
-            text += '.'
+        text = text[0].upper() + text[1:] if text else ""
+        # Добавление точки в конце (без дублирования)
+        if not text.endswith("."):
+            text += "."
         return text
+
+
+class Сompound(BaseModel):
+    action: str
+    line: int
+
+    @field_validator("action", mode="before")
+    def compound(cls, v: Any) -> str:
+        """Нормализует вывод/заключение: удаляет переносы строк, схлопывает множественные пробелы"""
+        action = " ".join(str(v).split()).lower()
+        # Первая буква в верхний регистр
+        action = action[0].upper() + action[1:] if action else ""
+        return action

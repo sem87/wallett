@@ -2,7 +2,7 @@ name: Test Sem
 
 on:
   workflow_dispatch:
-    branches: [main,dock]
+    branches: [main]
 
 jobs:
   lint:

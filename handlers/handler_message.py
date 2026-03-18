@@ -1,19 +1,20 @@
 # handlers/handler_message.py
-import time
 import random
-from aiogram import Router, F, types
-from aiogram.types import Message
+from datetime import datetime
+
+from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from aiogram.filters import CommandStart
+from aiogram.types import Message
+
+from googleteable import MONTH_TO_COLUMN, Delete_row, Dobavlenie, Dobavlenie_vstavka_strok, Izmenenie, Read
+from iiqwen import client, intelligence_def
 from kbds import inlinebtn  # убедитесь, что путь верный почему то ошибка в IDE
-from utils import is_admin
-import os
-from googleteable import *
-from datetime import datetime, timedelta
 from logi import logi
-from states import UserData  # ← Чистый и понятный импорт
 from pydant import pydantic_models
-from iiqwen import *
+from states import UserData  # ← Чистый и понятный импорт
+from utils import is_admin
+
+
 # from databazesql import databaze_sql_term
 
 handler_message_router = Router()
@@ -62,7 +63,7 @@ async def necessary_finances_btn(message: types.Message):
             column = MONTH_TO_COLUMN.get(month)
             if not column:
                 await message.answer("Ошибка: неизвестный месяц (должно быть 1-12)")
-                logi.err.info(f"dds_btn() неизвестный месяц handlers/handler_message.py ")
+                logi.err.info("dds_btn() неизвестный месяц handlers/handler_message.py ")
                 return
             # Читаем данные из таблицы
             try:
@@ -72,15 +73,13 @@ async def necessary_finances_btn(message: types.Message):
                 logi.err.info(f"necessary_finances_btn() ошибка ДДС,PNL handlers/handler_message, Exception as e : {e}")
             await message.answer(
                 f"💵Необход доход мес: {format_money(int(required_income))}p\n"
-                f"💵Необход доход день: {format_money(round(int(required_income)/30))}p\n"
+                f"💵Необход доход день: {format_money(round(int(required_income) / 30))}p\n"
                 f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
                 f"❗Необход расход мес: {format_money(int(required_consumption))}p\n"
                 f"❗Необход расход день: {format_money(round(int(required_consumption) / 30))}p\n"
             )
     except Exception as e:
         logi.err.info(f"F.text == необх финансы в папке handlers/handler_message.py , Exception as e : {e}")
-
-
 
 
 @handler_message_router.message(F.text == "🦾terminator🦾")
@@ -125,6 +124,33 @@ async def basics_btn(message: types.Message):
         logi.err.info(f"basics_btn() в папке handlers/handler_message.py , Exception as e : {e}")
 
 
+@handler_message_router.message(F.text == "💼состав💼/c")
+async def compound_btn(message: types.Message):
+    """ВСЕ ПО ПОВОДУ основной"""
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            return
+        else:
+            # ВСЯ ОСНОВНАЯ ЛОГИКА ТУТ
+            # Читаем данные из таблицы
+            ticker_compound = "None"
+            action_compound = "None"
+            sum_compound = "0"
+            for i in range(2, 26):
+                try:
+                    ticker_compound = Read(Nazvanie_operazii="", range=f"analystrade!Z{i}")[0]
+                    action_compound = Read(Nazvanie_operazii="", range=f"analystrade!AA{i}")[0]
+                    sum_compound = Read(Nazvanie_operazii="", range=f"analystrade!AB{i}")[0]
+                except Exception as e:
+                    logi.err.info(
+                        f"compound_btn_btn() ошибка состав портф handlers/handler_message, Exception as e : {e}"
+                    )
+                await message.answer(f"{i}){ticker_compound}: 💵{sum_compound}p == {action_compound}\n")
+    except Exception as e:
+        logi.err.info(f"compound_btn() в папке handlers/handler_message.py , Exception as e : {e}")
+
+
 #   ----------------НАЧАЛО СОСТОЯНИЯ МОЛНИЯ--------------------------
 # Команда /m — переключаемся в состояние для таблицы 1
 # входим в состояние
@@ -135,7 +161,7 @@ async def cmd_m(message: Message, state: FSMContext):
         if not is_admin(message.from_user.id):
             await message.delete()
             return
-        await message.answer(f"работа с таблицей ⚡⚡⚡ молния ⚡⚡⚡")
+        await message.answer("работа с таблицей ⚡⚡⚡ молния ⚡⚡⚡")
         await state.set_state(UserData.TABLE_1)  # 🔑 Запоминаем контекст
         await message.answer("✏️ Введите данные для таблицы : SBER;b or s;12;309,34;вывод", parse_mode="HTML")
     except Exception as e:
@@ -156,8 +182,9 @@ async def handle_table1_data(message: Message, state: FSMContext):
             await message.answer("Неверный формат!")
             return
         tiker, action, quantity, price, conclusion = parts
-        d_light = pydantic_models.Lightning(tiker=tiker, action=action, quantity=quantity, price=price,
-                                            conclusion=conclusion)
+        d_light = pydantic_models.Lightning(
+            tiker=tiker, action=action, quantity=quantity, price=price, conclusion=conclusion
+        )
         now = datetime.now()
         # Форматированная дата "д.м.г"
         date_str = now.strftime("%Y-%m-%d")
@@ -171,15 +198,31 @@ async def handle_table1_data(message: Message, state: FSMContext):
             take_profit = round(d_light.price * 0.97, 2)
         else:
             logi.inf.info(
-                f"handle_table1_data() в папке handlers/handler_message.py , не правильно написано {d_light.action}")
+                f"handle_table1_data() в папке handlers/handler_message.py , не правильно написано {d_light.action}"
+            )
         plan_deistvi = [
-            [d_light.tiker, "молния", d_light.action, date_str, d_light.quantity, d_light.price, stop_market,
-             stop_market_0, take_profit, d_light.conclusion]]
-        Dobavlenie(Nazvanie_operazii="", diapozon_dannich="молния!A5", znachenie=plan_deistvi, )
+            [
+                d_light.tiker,
+                "молния",
+                d_light.action,
+                date_str,
+                d_light.quantity,
+                d_light.price,
+                stop_market,
+                stop_market_0,
+                take_profit,
+                d_light.conclusion,
+            ]
+        ]
+        Dobavlenie(
+            Nazvanie_operazii="",
+            diapozon_dannich="молния!A5",
+            znachenie=plan_deistvi,
+        )
         await message.answer(f"🛑 Стоп маркет - {stop_market}")
         await message.answer(f"↔️ Безубыточность - {stop_market_0}")
         await message.answer(f"✅ Тейк-профит - {take_profit}")
-        await message.answer(f"Данные сохранены в молния")
+        await message.answer("Данные сохранены в молния")
         await state.clear()  # Выходим из состояния
     except Exception as e:
         logi.err.info(f"handle_table1_data() в папке handlers/handler_message.py , Exception as e : {e}")
@@ -196,7 +239,7 @@ async def cmd_o(message: Message, state: FSMContext):
         if not is_admin(message.from_user.id):
             await message.delete()
             return
-        await message.answer(f"работа с таблицей 💹основной💹")
+        await message.answer("работа с таблицей 💹основной💹")
         await state.set_state(UserData.TABLE_2)  # Запоминаем контекст
         await message.answer("✏️ Введите данные для ОСНОВНОЙ : SBER;12;309,34;вывод", parse_mode="HTML")
     except Exception as e:
@@ -217,8 +260,9 @@ async def handle_table2_data_basic(message: Message, state: FSMContext):
             await message.answer("Неверный формат!")
             return
         tiker, quantity, price, conclusion = parts
-        d_basic = pydantic_models.Lightning(tiker=tiker, action="покупка", quantity=quantity, price=price,
-                                            conclusion=conclusion)
+        d_basic = pydantic_models.Lightning(
+            tiker=tiker, action="покупка", quantity=quantity, price=price, conclusion=conclusion
+        )
         now = datetime.now()
         # Форматированная дата "д.м.г"
         date_str = now.strftime("%Y-%m-%d")
@@ -227,19 +271,83 @@ async def handle_table2_data_basic(message: Message, state: FSMContext):
         stop_market_0_basic = round(d_basic.price * 1.001, 2)
         take_profit_basic = round(d_basic.price * 1.03, 2)
         plan_deistvi_basic = [
-            [d_basic.tiker, "основной", d_basic.action, date_str, d_basic.quantity, d_basic.price, stop_market_basic,
-             stop_market_0_basic, take_profit_basic, d_basic.conclusion]]
-        Dobavlenie(Nazvanie_operazii="", diapozon_dannich="основной!A5", znachenie=plan_deistvi_basic, )
+            [
+                d_basic.tiker,
+                "основной",
+                d_basic.action,
+                date_str,
+                d_basic.quantity,
+                d_basic.price,
+                stop_market_basic,
+                stop_market_0_basic,
+                take_profit_basic,
+                d_basic.conclusion,
+            ]
+        ]
+        Dobavlenie(
+            Nazvanie_operazii="",
+            diapozon_dannich="основной!A5",
+            znachenie=plan_deistvi_basic,
+        )
         await message.answer(f"🛑 Стоп маркет - {stop_market_basic}")
         await message.answer(f"↔️ Безубыточность - {stop_market_0_basic}")
         await message.answer(f"✅ Тейк-профит - {take_profit_basic}")
-        await message.answer(f"Данные сохранены в 💹основной💹")
+        await message.answer("Данные сохранены в 💹основной💹")
         await state.clear()  # Выходим из состояния
     except Exception as e:
         logi.err.info(f"handle_table2_data_basic() в папке handlers/handler_message.py , Exception as e : {e}")
 
 
 #   ----------------КОНЕЦ СОСТОЯНИЯ ОСНОВНОЙ---------------------
+
+
+#   ----------------НАЧАЛО СОСТОЯНИЯ СОСТАВ ПОРТФЕЛЯ--------------------
+# Команда /c — переключаемся в состояние для таблицы 4
+# входим в состояние
+@handler_message_router.message(F.text == "/c")
+async def cmd_c(message: Message, state: FSMContext):
+    """СОСТОЯНИЕ /c ВНОСИМ ДАННЫЕ В 💼состав💼/c"""
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            return
+        await message.answer("работа с таблицей 💼состав💼")
+        await state.set_state(UserData.TABLE_4)  # Запоминаем контекст
+        await message.answer("✏️ Введите данные для 💼состав💼: строка ; действие", parse_mode="HTML")
+    except Exception as e:
+        logi.err.info(f"cmd_o() в папке handlers/handler_message.py , Exception as e : {e}")
+
+
+@handler_message_router.message(UserData.TABLE_4)
+async def handle_table4_data_basic(message: Message, state: FSMContext):
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            await state.clear()
+            return
+        text = message.text.strip()
+        # Парсим данные (разделяем по ;)
+        parts = text.split(";", 1)  # Разбиваем на 2 части максимум
+        if len(parts) != 2:
+            await message.answer("Неверный формат!")
+            return
+        line, action = parts
+        compound_pydent = pydantic_models.Сompound(line=line, action=action)
+        compound_pydent_str = [[compound_pydent.action]]
+        Izmenenie(
+            Nazvanie_operazii="",
+            diapozon_dannich=f"analystrade!AA{compound_pydent.line}",
+            znachenie=compound_pydent_str,
+        )
+        await message.answer("Данные сохранены в 💼состав💼 в действие")
+        await state.clear()  # Выходим из состояния
+    except Exception as e:
+        logi.err.info(f"handle_table4_data_basic() в папке handlers/handler_message.py , Exception as e : {e}")
+
+
+#   ----------------КОНЕЦ СОСТОЯНИЯ СОСТАВ ПОРТФЕЛЯ---------------------
+
+
 #   ----------------НАЧАЛО СОСТОЯНИЯ ДДС-------------------------
 @handler_message_router.message(F.text == "ДДС")
 async def dds_btn(message: types.Message):
@@ -253,7 +361,7 @@ async def dds_btn(message: types.Message):
     column = MONTH_TO_COLUMN.get(month)
     if not column:
         await message.answer("Ошибка: неизвестный месяц (должно быть 1-12)")
-        logi.err.info(f"dds_btn() неизвестный месяц handlers/handler_message.py ")
+        logi.err.info("dds_btn() неизвестный месяц handlers/handler_message.py ")
         return
     # Читаем данные из таблицы
     try:
@@ -270,7 +378,7 @@ async def dds_btn(message: types.Message):
         return
     # Формируем ответ
     months_cov = round(int(dds_ostatok) / monthly_expenses, 1)
-    months_covered = months_cov if months_cov > 0 else str("⛔⛔⛔ Денег вообще нет. 0")
+    months_covered = months_cov if months_cov > 0 else "⛔⛔⛔ Денег вообще нет. 0"
     await message.answer(
         "📊 ФИНАНСОВЫЙ ОТЧЁТ ПО ДДС\n\n"
         f"🔜Входящий поток: {format_money(dds_vchod)} ₽\n"
@@ -283,7 +391,8 @@ async def dds_btn(message: types.Message):
         f"Кассовый разрыв: {format_money(dds_kassa)} ₽\n"
         f"➖➖➖➖➖➖➖➖➖➖➖\n"
         f"💰Средний доход в мес: {format_money(monthly_income)} ₽\n"
-        f"📈Средние затраты в мес: {format_money(monthly_expenses)} ₽\n")
+        f"📈Средние затраты в мес: {format_money(monthly_expenses)} ₽\n"
+    )
 
     # Анализ кассового разрыва
 
@@ -297,7 +406,9 @@ async def dds_btn(message: types.Message):
             "3️⃣Где можно сэкономить?\n"
             "4️⃣Где уменьшился доход и почему?\n"
             "5️⃣От каких трат можно отказаться?\n"
-            "☠️ ЭТО ПРЕДЕЛ!", reply_markup=inlinebtn.dds_btn_detail())
+            "☠️ ЭТО ПРЕДЕЛ!",
+            reply_markup=inlinebtn.dds_btn_detail(),
+        )
     elif int(dds_kassa) < 0:
         cushion_needed = abs(int(dds_kassa)) * 3
         await message.answer(
@@ -306,12 +417,13 @@ async def dds_btn(message: types.Message):
             "2️⃣Срочно принимайте меры!\n"
             f"3️Нужна фин подушка:{format_money(cushion_needed)} ₽\n"
             "4️⃣Где уменьшился доход и почему?\n"
-            "5️⃣От каких трат можно отказаться?\n", reply_markup=inlinebtn.dds_btn_detail())
+            "5️⃣От каких трат можно отказаться?\n",
+            reply_markup=inlinebtn.dds_btn_detail(),
+        )
     else:
         await message.answer(
-            "🟢 КАССОВЫЙ РАЗРЫВ ОТСУТСТВУЕТ!\n"
-            "Все платежи покрыты.\n"
-            "👍", reply_markup=inlinebtn.dds_btn_detail())
+            "🟢 КАССОВЫЙ РАЗРЫВ ОТСУТСТВУЕТ!\nВсе платежи покрыты.\n👍", reply_markup=inlinebtn.dds_btn_detail()
+        )
 
 
 #   ----------------КОНЕЦ СОСТОЯНИЯ ДДС-------------------------
@@ -328,7 +440,7 @@ async def pnl_btn(message: types.Message):
     column = MONTH_TO_COLUMN.get(month)
     if not column:
         await message.answer("Ошибка: неизвестный месяц (должно быть 1-12)")
-        logi.err.info(f"pnl_btn() неизвестный месяц handlers/handler_message.py ")
+        logi.err.info("pnl_btn() неизвестный месяц handlers/handler_message.py ")
         return
     # Читаем данные из таблицы
     try:
@@ -365,24 +477,26 @@ async def pnl_btn(message: types.Message):
             "🔴🔴🔴 Чистая прибыль отрицательная!\n"
             "❗❗❗Срочные меры:\n"
             "1️⃣Проблемы с выручкой\n"
-            f"2️⃣Высокая себестоимость\n"
+            "2️⃣Высокая себестоимость\n"
             "3️⃣Операционные расходы (OPEX) «съедают» маржу\n"
             "4️⃣ Финансовые и разовые факторы\n"
             "5️⃣Посчитайте точку безубыточности\n"
-            "☠️ НУЖНО ДЕЙСТВОВАТЬ!!!", reply_markup=inlinebtn.pnl_btn_detail())
+            "☠️ НУЖНО ДЕЙСТВОВАТЬ!!!",
+            reply_markup=inlinebtn.pnl_btn_detail(),
+        )
     elif int(pnl_net_profit) < 0:
         await message.answer(
             "⚠️⚠️⚠️Чистая прибыль отрицательная!\n"
             "Скоро начнутся проблемы\n"
             "1️⃣Проблемы с выручкой\n"
-            f"2️⃣Высокая себестоимость\n"
+            "2️⃣Высокая себестоимость\n"
             "3️⃣Операционные расходы (OPEX) «съедают» маржу\n"
             "4️⃣ Финансовые и разовые факторы\n"
-            "5️⃣Посчитайте точку безубыточности\n", reply_markup=inlinebtn.pnl_btn_detail())
+            "5️⃣Посчитайте точку безубыточности\n",
+            reply_markup=inlinebtn.pnl_btn_detail(),
+        )
     else:
-        await message.answer(
-            "✅✅✅ Чистая прибыль больше 0!\n"
-            "👍", reply_markup=inlinebtn.pnl_btn_detail())
+        await message.answer("✅✅✅ Чистая прибыль больше 0!\n👍", reply_markup=inlinebtn.pnl_btn_detail())
 
 
 #   ----------------КОНЕЦ СОСТОЯНИЯ PNL-------------------------
@@ -399,7 +513,7 @@ async def balans_btn(message: types.Message):
     column = MONTH_TO_COLUMN.get(month)
     if not column:
         await message.answer("Ошибка: неизвестный месяц (должно быть 1-12)")
-        logi.err.info(f"balans_btn() неизвестный месяц handlers/handler_message.py ")
+        logi.err.info("balans_btn() неизвестный месяц handlers/handler_message.py ")
         return
     # Читаем данные из таблицы
     try:
@@ -419,20 +533,23 @@ async def balans_btn(message: types.Message):
         f"➖➖➖➖➖➖➖➖➖➖➖\n"
         f"ROE: {balance_roe} \n"
         f"Собственный капитал: {format_money(balance_sobstvennii_capital)} ₽\n"
-        f"Увеличился собственный капитал: {format_money(balance_uvelichelsa_sobstvennii_capital)} ₽\n")
+        f"Увеличился собственный капитал: {format_money(balance_uvelichelsa_sobstvennii_capital)} ₽\n"
+    )
     # Анализ, баланса
     if int(balance_uvelichelsa_sobstvennii_capital) < 0:
         await message.answer(
             "🔴🔴🔴 С балансом все плохо!\n"
             "❗❗❗Срочные меры:\n"
             "1️⃣ Убытки от деятельности\n"
-            f"2️⃣НУЖНО ПОДУМАТЬ И ВНЕСТИ ПРИЧИНЫ❗❗❗\n"
-            "☠️ НУЖНО ДЕЙСТВОВАТЬ!!!", reply_markup=inlinebtn.balance_btn_detail())
+            "2️⃣НУЖНО ПОДУМАТЬ И ВНЕСТИ ПРИЧИНЫ❗❗❗\n"
+            "☠️ НУЖНО ДЕЙСТВОВАТЬ!!!",
+            reply_markup=inlinebtn.balance_btn_detail(),
+        )
     else:
         await message.answer(
-            "✅✅✅ Увеличился собственный капитал больше 0!\n"
-            "НУЖНО РАЗОБРАТСЯ В ВЫВОДАХ\n"
-            "👍", reply_markup=inlinebtn.balance_btn_detail())
+            "✅✅✅ Увеличился собственный капитал больше 0!\nНУЖНО РАЗОБРАТСЯ В ВЫВОДАХ\n👍",
+            reply_markup=inlinebtn.balance_btn_detail(),
+        )
 
 
 #   ----------------КОНЕЦ СОСТОЯНИЯ БАЛАНС-------------------------
@@ -448,7 +565,7 @@ async def cmd_d(message: Message, state: FSMContext):
         if not is_admin(message.from_user.id):
             await message.delete()
             return
-        await message.answer(f"работа с таблицей ⚙️ДЕЛА⚙️/d")
+        await message.answer("работа с таблицей ⚙️ДЕЛА⚙️/d")
         await state.set_state(UserData.TABLE_3)  # Запоминаем контекст
         await message.answer("✏️ Введите номер строки для удаления", parse_mode="HTML")
     except Exception as e:
@@ -483,8 +600,8 @@ async def do_list(message: types.Message):
         if not is_admin(message.from_user.id):
             await message.delete()
             return
-        await message.answer(f"Рандомно дела ...⏳")
-        everything_to_do = Read(Nazvanie_operazii="", range=f"Дела и управление!J2")[0]
+        await message.answer("Рандомно дела ...⏳")
+        everything_to_do = Read(Nazvanie_operazii="", range="Дела и управление!J2")[0]
         await message.answer(f"⚙️Всего дел : {everything_to_do}\n")
         random_string = str(random.randint(1, int(everything_to_do)) + 3)
         # Читаем рандомно дела
@@ -492,24 +609,23 @@ async def do_list(message: types.Message):
         tasks = Read(Nazvanie_operazii="", range=f"Дела и управление!E{random_string}")[0]
         artificial_intelligence = Read(Nazvanie_operazii="", range=f"Дела и управление!F{random_string}")[0]
         other_information = Read(Nazvanie_operazii="", range=f"Дела и управление!G{random_string}:I{random_string}")
-        await message.answer(
-            "⚙️ДЕЛА РАНДОМНО⚙️\n\n"
-            f"Строка {random_string}\n\n"
-            f"{other_information}")
+        await message.answer(f"⚙️ДЕЛА РАНДОМНО⚙️\n\nСтрока {random_string}\n\n{other_information}")
         await message.answer(f"{tasks}\n")
         await message.answer(f"{artificial_intelligence}\n")
-        dead_line_datetime = datetime.strptime(dead_line, '%Y-%m-%d')
+        dead_line_datetime = datetime.strptime(dead_line, "%Y-%m-%d")
         now = datetime.now()
         if dead_line_datetime > now:
             await message.answer(
                 f"❗Дед-лайн {dead_line_datetime.date()}❗\n"
                 f"В запасе  {(dead_line_datetime - now).days} дней\n"
-                f"🕰️Время есть еще...\n")
+                f"🕰️Время есть еще...\n"
+            )
         else:
             await message.answer(
                 f"❗Дед-лайн {dead_line_datetime.date()}❗\n"
                 f"🩸🩸🩸ПРОСРОЧЕНО на {(dead_line_datetime - now).days} дней\n"
-                f"🩸Быстрее нужно делать\n")
+                f"🩸Быстрее нужно делать\n"
+            )
     except Exception as e:
         logi.err.info(f"do_list() в папке handlers/handler_message.py , Exception as e : {e}")
 
@@ -522,18 +638,36 @@ async def management(message: types.Message):
         if not is_admin(message.from_user.id):
             await message.delete()
             return
-        await message.answer(f"работа с таблицей 💸Дела и управление💸")
+        await message.answer("работа с таблицей 💸Дела и управление💸")
         # Форматированная дата "д.м.г"
         date_str = datetime.now().strftime("%Y-%m-%d")
         text = pydantic_models.StartIndication(text=message.text.strip())
         intellig = intelligence_def(text=text.text, client=client)
         intelligence = pydantic_models.StartIndication(text=intellig)
         await message.answer(intelligence.text)
-        action_plan = [["zzz", date_str, "zzz", "zzz", text.text, intelligence.text, "zzz", "С+А", "zzz", "zzz", ]]
-        Dobavlenie_vstavka_strok(Nazvanie_operazii="", diapozon_dannich="Дела и управление!A5", znachenie=action_plan, )
+        action_plan = [
+            [
+                "zzz",
+                date_str,
+                "zzz",
+                "zzz",
+                text.text,
+                intelligence.text,
+                "zzz",
+                "С+А",
+                "zzz",
+                "zzz",
+            ]
+        ]
+        Dobavlenie_vstavka_strok(
+            Nazvanie_operazii="",
+            diapozon_dannich="Дела и управление!A5",
+            znachenie=action_plan,
+        )
         await message.answer("👍")
         await message.answer("ОТЛИЧНАЯ ИДЕЯ!Спасибо ХОЗЯИН", reply_markup=inlinebtn.management_btn())
     except Exception as e:
         logi.err.info(f"management() в папке handlers/handler_message.py , Exception as e : {e}")
+
 
 #   ----------------КОНЕЦ ЗАПИСЬ ДЕЛА--------------------------
