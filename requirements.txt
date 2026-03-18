@@ -12,3 +12,4 @@ dashscope ==  1.25.12
 huggingface_hub == 1.4.1
 pytest == 9.0.2
 SQLAlchemy == 2.0.44
+aiohttp_socks==0.8.4
