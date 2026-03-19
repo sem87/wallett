@@ -18,6 +18,8 @@ services:
       - ./logs:/app/logs
       # Кэш и временные данные
       - ./data:/app/data
+      # 🗄️ БАЗА ДАННЫХ — добавляем эту строку:
+      - ./terminator:/app/terminator  # ← Ключевая строка!
 
     # 🔐 Переменные окружения (можно продублировать из .env.wallet)
     environment:
