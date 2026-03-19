@@ -1,21 +1,24 @@
 # handlers/callbackdata.py
 
-from aiogram import Router, F
+from datetime import datetime
+
+from aiogram import F, Router
 from aiogram.types import CallbackQuery
-from aiogram.fsm.context import FSMContext  # если понадобится состояние
+
+from databazesql import databaze_sql_term
+from googleteable import DATA_TO_MONTH, MONTH_TO_COLUMN, Izmenenie, Read
+from logi import logi
+
 # from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
 from utils import is_admin
-from logi import logi
-from googleteable import *
-from datetime import datetime, timedelta
-from databazesql import databaze_sql_term
+
 
 callback_router = Router()
 
 
 # ---------------------НАЧАЛО КНОПОК ДЛЯ молнии-----------------
 @callback_router.callback_query(F.data == "result_month")
-async def process_result_month(callback: CallbackQuery, state: FSMContext):
+async def process_result_month(callback: CallbackQuery):
     """РЕЗУЛЬТАТЫ ЗА МЕСЯЦ"""
     try:
         if not is_admin(callback.from_user.id):
@@ -28,7 +31,7 @@ async def process_result_month(callback: CallbackQuery, state: FSMContext):
         month = datetime.now().month
         column = MONTH_TO_COLUMN.get(month)
         if not column:
-            logi.err.info(f"process_result_month() неизвестный месяц handlers/callbackdata ")
+            logi.err.info("process_result_month() неизвестный месяц handlers/callbackdata ")
             return
         # Читаем данные из таблицы
         try:
@@ -37,17 +40,17 @@ async def process_result_month(callback: CallbackQuery, state: FSMContext):
             logi.err.info(f"process_result_month() ошибка ДДС,PNL handlers/callbackdata , Exception as e : {e}")
             return
         if int(result_month) > 0:
-            await callback.message.answer(f"🏋️нужно побороть инфляцию")
+            await callback.message.answer("🏋️нужно побороть инфляцию")
             await callback.message.answer(f"молния за месяц : {result_month}")
         else:
-            await callback.message.answer(f"🩸🩸🩸ОЧЕНЬ ПЛОХАЯ ТОРГОВЛЯ🩸🩸🩸")
+            await callback.message.answer("🩸🩸🩸ОЧЕНЬ ПЛОХАЯ ТОРГОВЛЯ🩸🩸🩸")
             await callback.message.answer(f"молния за месяц : {result_month}")
     except Exception as e:
         logi.err.info(f"process_result_month() в папке handlers/callbackdata , Exception as e : {e}")
 
 
 @callback_router.callback_query(F.data == "win_rate")
-async def process_result_win_rate(callback: CallbackQuery, state: FSMContext):
+async def process_result_win_rate(callback: CallbackQuery):
     """win_rate"""
     try:
         if not is_admin(callback.from_user.id):
@@ -56,8 +59,8 @@ async def process_result_win_rate(callback: CallbackQuery, state: FSMContext):
         # Правильное подтверждение нажатия кнопки
         await callback.answer("Загружаю win_rate...", show_alert=False)
         # Отправка сообщения через callback.bot
-        win_rate_sum = Read(Nazvanie_operazii="", range=f"молния!Q2")[0]
-        calculated_risk = Read(Nazvanie_operazii="", range=f"молния!P2")[0]
+        win_rate_sum = Read(Nazvanie_operazii="", range="молния!Q2")[0]
+        calculated_risk = Read(Nazvanie_operazii="", range="молния!P2")[0]
         await callback.message.answer(f"win_rate за все время : {win_rate_sum}")
         await callback.message.answer(f"расчетный риск : {calculated_risk}")
     except Exception as e:
@@ -65,7 +68,7 @@ async def process_result_win_rate(callback: CallbackQuery, state: FSMContext):
 
 
 @callback_router.callback_query(F.data == "rez2")
-async def process_result_rez2(callback: CallbackQuery, state: FSMContext):
+async def process_result_rez2(callback: CallbackQuery):
     """rez2"""
     try:
         if not is_admin(callback.from_user.id):
@@ -82,7 +85,7 @@ async def process_result_rez2(callback: CallbackQuery, state: FSMContext):
 # ---------------------КОНЕЦ КНОПОК ДЛЯ молнии---------------
 # ---------------------НАЧАЛО КНОПОК ДЛЯ основной------------
 @callback_router.callback_query(F.data == "result_month_basic")
-async def process_result_month_basic(callback: CallbackQuery, state: FSMContext):
+async def process_result_month_basic(callback: CallbackQuery):
     """РЕЗУЛЬТАТЫ ЗА МЕСЯЦ"""
     try:
         if not is_admin(callback.from_user.id):
@@ -95,7 +98,7 @@ async def process_result_month_basic(callback: CallbackQuery, state: FSMContext)
         month = datetime.now().month
         column = MONTH_TO_COLUMN.get(month)
         if not column:
-            logi.err.info(f"process_result_month_basic() неизвестный месяц handlers/callbackdata ")
+            logi.err.info("process_result_month_basic() неизвестный месяц handlers/callbackdata ")
             return
         # Читаем данные из таблицы
         try:
@@ -104,17 +107,17 @@ async def process_result_month_basic(callback: CallbackQuery, state: FSMContext)
             logi.err.info(f"process_result_month_basic() ошибка ДДС,PNL handlers/callbackdata , Exception as e : {e}")
             return
         if int(result_month) > 0:
-            await callback.message.answer(f"🏋️нужно побороть инфляцию")
+            await callback.message.answer("🏋️нужно побороть инфляцию")
             await callback.message.answer(f"основной за месяц : {result_month}")
         else:
-            await callback.message.answer(f"🩸🩸🩸ОЧЕНЬ ПЛОХАЯ ТОРГОВЛЯ🩸🩸🩸")
+            await callback.message.answer("🩸🩸🩸ОЧЕНЬ ПЛОХАЯ ТОРГОВЛЯ🩸🩸🩸")
             await callback.message.answer(f"основной за месяц : {result_month}")
     except Exception as e:
         logi.err.info(f"process_result_month_basic() в папке handlers/callbackdata , Exception as e : {e}")
 
 
 @callback_router.callback_query(F.data == "win_rate_basic")
-async def process_result_win_rate_basic(callback: CallbackQuery, state: FSMContext):
+async def process_result_win_rate_basic(callback: CallbackQuery):
     """win_rate"""
     try:
         if not is_admin(callback.from_user.id):
@@ -123,8 +126,8 @@ async def process_result_win_rate_basic(callback: CallbackQuery, state: FSMConte
         # Правильное подтверждение нажатия кнопки
         await callback.answer("Загружаю win_rate...", show_alert=False)
         # Отправка сообщения через callback.bot
-        win_rate_sum = Read(Nazvanie_operazii="", range=f"основной!Q2")[0]
-        calculated_risk = Read(Nazvanie_operazii="", range=f"основной!P2")[0]
+        win_rate_sum = Read(Nazvanie_operazii="", range="основной!Q2")[0]
+        calculated_risk = Read(Nazvanie_operazii="", range="основной!P2")[0]
         await callback.message.answer(f"win_rate за все время : {win_rate_sum}")
         await callback.message.answer(f"расчетный риск : {calculated_risk}")
     except Exception as e:
@@ -134,7 +137,7 @@ async def process_result_win_rate_basic(callback: CallbackQuery, state: FSMConte
 # ---------------------КОНЕЦ КНОПОК ДЛЯ основной-------------
 # ---------------------НАЧАЛО КНОПОК ДЛЯ terminator----------
 @callback_router.callback_query(F.data == "result_day_terminator")
-async def result_day_terminator_def(callback: CallbackQuery, state: FSMContext):
+async def result_day_terminator_def(callback: CallbackQuery):
     """РЕЗУЛЬТАТЫ ЗА ДЕНЬ"""
     try:
         if not is_admin(callback.from_user.id):
@@ -144,19 +147,21 @@ async def result_day_terminator_def(callback: CallbackQuery, state: FSMContext):
         await callback.answer("terminator за день...", show_alert=False)
         # Отправка сообщения через callback.bot
         await callback.message.answer("РЕЗУЛЬТАТЫ ЗА ДЕНЬ")
-        # rows_day = databaze_sql_term.total_trade_by_day()
-        # for row_day in rows_day:
-        #     await callback.message.answer(
-        #         f"🖊️Дата - {row_day['sale_date']}\n"
-        #         f"Итого : {round(row_day['total_net'], 1)} р\n"
-        #         f"📊Процент : {row_day['total_percent']}%\n"
-        #     )
+
+        rows_day = databaze_sql_term.total_trade_by_day()
+        for row_day in rows_day:
+            await callback.message.answer(
+                f"🖊️Дата - {row_day['sale_date']}\n"
+                f"Итого : {round(row_day['total_net'], 1)} р\n"
+                f"📊Процент : {row_day['total_percent']}%\n"
+            )
+
     except Exception as e:
         logi.err.info(f"result_day_terminator_def() в папке handlers/callbackdata , Exception as e : {e}")
 
 
 @callback_router.callback_query(F.data == "result_month_terminator")
-async def result_month_terminator_def(callback: CallbackQuery, state: FSMContext):
+async def result_month_terminator_def(callback: CallbackQuery):
     """РЕЗУЛЬТАТЫ ЗА МЕСЯЦ"""
     try:
         if not is_admin(callback.from_user.id):
@@ -166,21 +171,25 @@ async def result_month_terminator_def(callback: CallbackQuery, state: FSMContext
         await callback.answer("terminator за месяц...", show_alert=False)
         # Отправка сообщения через callback.bot
         await callback.message.answer("РЕЗУЛЬТАТЫ ЗА МЕСЯЦ")
-        # rows_month = databaze_sql_term.total_trade_by_moth()
-        # for row_month in rows_month:
-        #     await callback.message.answer(
-        #         f"🖊️Дата - {row_month['sale_month']}\n"
-        #         f"Итого : {round(row_month['total_net'], 1)} р\n"
-        #         f"🤝Количество сделок : {row_month['deals_count']}шт\n")
-        #     strok = DATA_TO_MONTH[row_month['sale_month']]
-        #     Izmenenie(Nazvanie_operazii="", diapozon_dannich=f"terminator!A{strok}:C{strok}",
-        #               znachenie=[[row_month['sale_month'], round(row_month['total_net'], 1), row_month['deals_count']]])
+        rows_month = databaze_sql_term.total_trade_by_moth()
+        for row_month in rows_month:
+            await callback.message.answer(
+                f"🖊️Дата - {row_month['sale_month']}\n"
+                f"Итого : {round(row_month['total_net'], 1)} р\n"
+                f"🤝Количество сделок : {row_month['deals_count']}шт\n"
+            )
+            strok = DATA_TO_MONTH[row_month["sale_month"]]
+            Izmenenie(
+                Nazvanie_operazii="",
+                diapozon_dannich=f"terminator!A{strok}:C{strok}",
+                znachenie=[[row_month["sale_month"], round(row_month["total_net"], 1), row_month["deals_count"]]],
+            )
     except Exception as e:
         logi.err.info(f"result_month_terminator_def() в папке handlers/callbackdata , Exception as e : {e}")
 
 
 @callback_router.callback_query(F.data == "win_rate_terminator")
-async def win_rate_terminator_def(callback: CallbackQuery, state: FSMContext):
+async def win_rate_terminator_def(callback: CallbackQuery):
     """win_rate"""
     try:
         if not is_admin(callback.from_user.id):
@@ -196,7 +205,7 @@ async def win_rate_terminator_def(callback: CallbackQuery, state: FSMContext):
 
 
 @callback_router.callback_query(F.data == "briefcase")
-async def briefcase_def(callback: CallbackQuery, state: FSMContext):
+async def briefcase_def(callback: CallbackQuery):
     """ЧТО В ПОРТФЕЛЕ"""
     try:
         if not is_admin(callback.from_user.id):
@@ -206,19 +215,19 @@ async def briefcase_def(callback: CallbackQuery, state: FSMContext):
         await callback.answer("ЧТО В ПОРТФЕЛЕ...", show_alert=False)
         # Отправка сообщения через callback.bot
         await callback.message.answer("ЧТО В ПОРТФЕЛЕ")
-        # rows_briefcase = databaze_sql_term.what_in_briefcase()
-        # for row_briefcase in rows_briefcase:
-        #     await callback.message.answer(
-        #         f"📝Тикер - {row_briefcase['tiker']}\n"
-        #         f"Кол-во : {row_briefcase['quantity_buy']} шт\n"
-        #         f"Цена покупки : {row_briefcase['buy_price']}р\n"
-        #     )
+        rows_briefcase = databaze_sql_term.what_in_briefcase()
+        for row_briefcase in rows_briefcase:
+            await callback.message.answer(
+                f"📝Тикер - {row_briefcase['tiker']}\n"
+                f"Кол-во : {row_briefcase['quantity_buy']} шт\n"
+                f"Цена покупки : {row_briefcase['buy_price']}р\n"
+            )
     except Exception as e:
         logi.err.info(f"briefcase_def() в папке handlers/callbackdata , Exception as e : {e}")
 
 
 @callback_router.callback_query(F.data == "rez_terminator")
-async def process_result_rez_terminator(callback: CallbackQuery, state: FSMContext):
+async def process_result_rez_terminator(callback: CallbackQuery):
     """rez_terminator"""
     try:
         if not is_admin(callback.from_user.id):
@@ -235,7 +244,7 @@ async def process_result_rez_terminator(callback: CallbackQuery, state: FSMConte
 # ---------------------КОНЕЦ КНОПОК ДЛЯ terminator-----------------
 # ---------------------НАЧАЛО КНОПОК ДЛЯ УПРАВЛЕНИЕ-----------------
 @callback_router.callback_query(F.data == "random")
-async def process_management(callback: CallbackQuery, state: FSMContext):
+async def process_management(callback: CallbackQuery):
     """РАНДОМНО ВЫДАЕТ ЗАДАЧИ"""
     try:
         if not is_admin(callback.from_user.id):
@@ -252,7 +261,7 @@ async def process_management(callback: CallbackQuery, state: FSMContext):
 # ---------------------КОНЕЦ КНОПОК ДЛЯ УПРАВЛЕНИЕ-----------------
 # ---------------------НАЧАЛО КНОПОК ДЛЯ ДДС-----------------
 @callback_router.callback_query(F.data == "incoming_flow_details")
-async def dds_btn_incoming_flow_details(callback: CallbackQuery, state: FSMContext):
+async def dds_btn_incoming_flow_details(callback: CallbackQuery):
     """Входящий поток подробно"""
     try:
         if not is_admin(callback.from_user.id):
@@ -265,7 +274,7 @@ async def dds_btn_incoming_flow_details(callback: CallbackQuery, state: FSMConte
         month = datetime.now().month
         column = MONTH_TO_COLUMN.get(month)
         if not column:
-            logi.err.info(f"dds_btn_incoming_flow_details() неизвестный месяц handlers/callbackdata ")
+            logi.err.info("dds_btn_incoming_flow_details() неизвестный месяц handlers/callbackdata ")
             return
         # Читаем данные из таблицы
         try:
@@ -284,13 +293,14 @@ async def dds_btn_incoming_flow_details(callback: CallbackQuery, state: FSMConte
             f"➖➖➖➖➖➖➖➖➖➖➖\n"
             f"terminator : {dds_terminator}\n"
             f"молния : {dds_molnia}\n"
-            f"основной : {dds_osnovnoi}\n")
+            f"основной : {dds_osnovnoi}\n"
+        )
     except Exception as e:
         logi.err.info(f"dds_btn_incoming_flow_details() в папке handlers/callbackdata , Exception as e : {e}")
 
 
 @callback_router.callback_query(F.data == "outgoing_flow_details")
-async def dds_btn_outgoing_flow_details(callback: CallbackQuery, state: FSMContext):
+async def dds_btn_outgoing_flow_details(callback: CallbackQuery):
     """Исходящий поток подробно"""
     try:
         if not is_admin(callback.from_user.id):
@@ -303,7 +313,7 @@ async def dds_btn_outgoing_flow_details(callback: CallbackQuery, state: FSMConte
         month = datetime.now().month
         column = MONTH_TO_COLUMN.get(month)
         if not column:
-            logi.err.info(f"dds_btn_outgoing_flow_details() неизвестный месяц handlers/callbackdata ")
+            logi.err.info("dds_btn_outgoing_flow_details() неизвестный месяц handlers/callbackdata ")
             return
         # Читаем данные из таблицы
         try:
@@ -323,7 +333,8 @@ async def dds_btn_outgoing_flow_details(callback: CallbackQuery, state: FSMConte
 
         except Exception as e:
             logi.err.info(
-                f"dds_btn_outgoing_flow_details() ошибка чтения таблицы ДДС,PNL handlers/handler_message.py , Exception as e : {e}")
+                f"dds_btn_outgoing_flow_details() ошибка чтения таблицы ДДС,PNL handlers/handler_message.py , Exception as e : {e}"
+            )
             return
         # ✅ Отправка сообщения через callback.bot
         await callback.message.answer(
@@ -348,7 +359,7 @@ async def dds_btn_outgoing_flow_details(callback: CallbackQuery, state: FSMConte
 # ---------------------КОНЕЦ КНОПОК ДЛЯ ДДС-----------------
 # ---------------------НАЧАЛО КНОПОК ДЛЯ PNL-----------------
 @callback_router.callback_query(F.data == "income_details")
-async def pnl_btn_income_details(callback: CallbackQuery, state: FSMContext):
+async def pnl_btn_income_details(callback: CallbackQuery):
     """Доходы подробно"""
     try:
         if not is_admin(callback.from_user.id):
@@ -363,7 +374,7 @@ async def pnl_btn_income_details(callback: CallbackQuery, state: FSMContext):
 
 
 @callback_router.callback_query(F.data == "expenses_detail")
-async def pnl_btn_expenses_detail(callback: CallbackQuery, state: FSMContext):
+async def pnl_btn_expenses_detail(callback: CallbackQuery):
     """Расходы подробно"""
     try:
         if not is_admin(callback.from_user.id):
@@ -375,4 +386,6 @@ async def pnl_btn_expenses_detail(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("ПОЯВИТСЯ БИЗНЕС ИЛИ ПЕРЕМЕННЫЕ РАСХОДЫ ДОБАВИЩЬ ЛОГИКУ")
     except Exception as e:
         logi.err.info(f"pnl_btn_expenses_detail() в папке handlers/callbackdata , Exception as e : {e}")
+
+
 # ---------------------КОНЕЦ КНОПОК ДЛЯ PNL-----------------

@@ -4,16 +4,16 @@ services:
     image: sem87sem/wallett:latest
     # 🔄 Или собираем локально (раскомментировать, если нужно)
     # build: .
-    container_name: wallett-bot
+    container_name: wallett-sem
     # 🔄 Автоперезапуск при падении
     restart: unless-stopped
     # Варианты: no | on-failure | always | unless-stopped
     # 🔒 Монтируем секретные файлы из хоста в контейнер
     volumes:
       # Файлы с секретами (только чтение для безопасности)
-      - ./ .env.wallet:/app/.env.wallet:ro
+      - ./.env.wallet:/app/.env.wallet:ro
       - ./credentials.json:/app/credentials.json:ro
-      - ./token.pickle:/app/token.pickle:ro
+      - ./token.pickle:/app/token.pickle
       # Логи (чтобы не терялись при перезапуске)
       - ./logs:/app/logs
       # Кэш и временные данные
