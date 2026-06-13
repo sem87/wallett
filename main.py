@@ -40,7 +40,7 @@ if __name__ == "__main__":
         login = f"{unquote(p.username)[:2]}****:" if p.username else ""
         print(f"🌐 Прокси: {p.scheme.upper()}://{login}****@{p.hostname}:{p.port}")
     else:
-        print("🌐 Прокси: ❌ не задан")
+        print("🌐 Прокси: ❌ не задан ttt")
 
     try:
         asyncio.run(main())
