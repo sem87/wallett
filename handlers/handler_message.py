@@ -21,6 +21,33 @@ handler_message_router = Router()
 
 
 #   ----------------НАЧАЛО КОНСТАНТЫ И ФУНКЦИИ БИЗНЕС ЛОГИКИ-------------------------
+dict_ticker_number={
+    "ROSN": 2,
+    "TATN": 3,
+    "LKOH": 4,
+    "NVTK": 5,
+    "SMLT": 6,
+    "PIKK": 7,
+    "RUAL": 8,
+    "GMKN": 9,
+    "PLZL": 10,
+    "VTBR": 11,
+    "SBER": 12,
+    "T": 13,
+    "EUTR": 14,
+    "IRAO": 15,
+    "ОФЗ 26225": 16,
+    "ОФЗ 26230": 17,
+    "ОФЗ 26233": 18,
+    "ОФЗ 26235": 19,
+    "ОФЗ 26238": 20,
+    "ОФЗ 26240": 21,
+    "TPAY": 22,
+    "CNY": 23,
+    "TGLD": 24,
+    "USD": 25
+}
+
 def average_monthly(type_activity=18):
     """РАСЧИТЫВАЕТ СРЕДНИЕ ЗА 12 МЕС ДДС_РАСХОДЫ=18,ДДС_ДОХОДЫ=3,PNL_РАСХОДЫ=62,PNL_ДОХОДЫ=52"""
     try:
@@ -241,7 +268,7 @@ async def cmd_o(message: Message, state: FSMContext):
             return
         await message.answer("работа с таблицей 💹основной💹")
         await state.set_state(UserData.TABLE_2)  # Запоминаем контекст
-        await message.answer("✏️ Введите данные для ОСНОВНОЙ : SBER;12;309,34;вывод", parse_mode="HTML")
+        await message.answer("✏️ Введите данные для ОСНОВНОЙ : SBER;12;309,34;на что мой расчет или надежда?тренд-(вниз),план-(после дивидендов...)", parse_mode="HTML")
     except Exception as e:
         logi.err.info(f"cmd_o() в папке handlers/handler_message.py , Exception as e : {e}")
 
@@ -270,6 +297,15 @@ async def handle_table2_data_basic(message: Message, state: FSMContext):
         stop_market_basic = round(d_basic.price * 0.994, 2)
         stop_market_0_basic = round(d_basic.price * 1.001, 2)
         take_profit_basic = round(d_basic.price * 1.03, 2)
+        vivod_itog="zzz"
+        # сопутствующие товары определять из словаря ичитать из гугл таблиц
+        tiker_to_dict=d_basic.tiker.upper()
+        if tiker_to_dict in dict_ticker_number:
+            i = dict_ticker_number[tiker_to_dict]
+            related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0])
+        else:
+            related_products = "нет такого тикера!"
+        # сделать корректно и исправить, проверить
         plan_deistvi_basic = [
             [
                 d_basic.tiker,
@@ -278,10 +314,9 @@ async def handle_table2_data_basic(message: Message, state: FSMContext):
                 date_str,
                 d_basic.quantity,
                 d_basic.price,
-                stop_market_basic,
-                stop_market_0_basic,
-                take_profit_basic,
                 d_basic.conclusion,
+                vivod_itog,
+                related_products,
             ]
         ]
         Dobavlenie(
