@@ -302,28 +302,12 @@ async def handle_table2_data_basic(message: Message, state: FSMContext):
         tiker_to_dict=d_basic.tiker.upper()
         if tiker_to_dict in dict_ticker_number:
             i = dict_ticker_number[tiker_to_dict]
-            related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0])
+            related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
         else:
-            related_products = "нет такого тикера!"
+            related_products = str("нет такого тикера!")
         # сделать корректно и исправить, проверить
-        plan_deistvi_basic = [
-            [
-                d_basic.tiker,
-                "основной",
-                d_basic.action,
-                date_str,
-                d_basic.quantity,
-                d_basic.price,
-                d_basic.conclusion,
-                vivod_itog,
-                related_products,
-            ]
-        ]
-        Dobavlenie(
-            Nazvanie_operazii="",
-            diapozon_dannich="основной!A5",
-            znachenie=plan_deistvi_basic,
-        )
+        plan_deistvi_basic = [[d_basic.tiker,"основной",d_basic.action,date_str,d_basic.quantity,d_basic.price,d_basic.conclusion,vivod_itog,related_products,]]
+        Dobavlenie(Nazvanie_operazii="",diapozon_dannich="основной!A5",znachenie=plan_deistvi_basic,)
         await message.answer(f"🛑 Стоп маркет - {stop_market_basic}")
         await message.answer(f"↔️ Безубыточность - {stop_market_0_basic}")
         await message.answer(f"✅ Тейк-профит - {take_profit_basic}")
@@ -331,8 +315,6 @@ async def handle_table2_data_basic(message: Message, state: FSMContext):
         await state.clear()  # Выходим из состояния
     except Exception as e:
         logi.err.info(f"handle_table2_data_basic() в папке handlers/handler_message.py , Exception as e : {e}")
-
-
 #   ----------------КОНЕЦ СОСТОЯНИЯ ОСНОВНОЙ---------------------
 
 
