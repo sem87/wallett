@@ -45,6 +45,6 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        logi.err.info("РОБОТ gnom sem87sem это яяяяяяяяя ОСТАНОВЛЕН В РУЧНУЮ")
+        logi.err.info("sem87sem робот ОСТАНОВЛЕН В РУЧНУЮ")
     except Exception as e:
         logi.err.info(f"main , Exception as e : {e}")
