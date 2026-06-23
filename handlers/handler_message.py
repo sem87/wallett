@@ -268,6 +268,7 @@ async def cmd_o(message: Message, state: FSMContext):
             return
         await message.answer("работа с таблицей 💹основной💹")
         await state.set_state(UserData.TABLE_2)  # Запоминаем контекст
+        await message.answer("не превышай лимит на покупку для уровня")
         await message.answer("✏️ Введите данные для ОСНОВНОЙ : SBER;12;309,34;на что мой расчет или надежда?тренд-(вниз),план-(после дивидендов...)", parse_mode="HTML")
     except Exception as e:
         logi.err.info(f"cmd_o() в папке handlers/handler_message.py , Exception as e : {e}")
@@ -287,9 +288,7 @@ async def handle_table2_data_basic(message: Message, state: FSMContext):
             await message.answer("Неверный формат!")
             return
         tiker, quantity, price, conclusion = parts
-        d_basic = pydantic_models.Lightning(
-            tiker=tiker, action="покупка", quantity=quantity, price=price, conclusion=conclusion
-        )
+        d_basic = pydantic_models.Lightning(tiker=tiker, action="покупка", quantity=quantity, price=price, conclusion=conclusion)
         now = datetime.now()
         # Форматированная дата "д.м.г"
         date_str = now.strftime("%Y-%m-%d")
@@ -303,14 +302,17 @@ async def handle_table2_data_basic(message: Message, state: FSMContext):
         if tiker_to_dict in dict_ticker_number:
             i = dict_ticker_number[tiker_to_dict]
             related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
+            level_price = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
         else:
-            related_products = str("нет такого тикера!")
+            related_products = "нет такого тикера!"
+            level_price = "нет данных по уровням"
         # сделать корректно и исправить, проверить
         plan_deistvi_basic = [[d_basic.tiker,"основной",d_basic.action,date_str,d_basic.quantity,d_basic.price,d_basic.conclusion,vivod_itog,related_products,]]
         Dobavlenie(Nazvanie_operazii="",diapozon_dannich="основной!A5",znachenie=plan_deistvi_basic,)
         await message.answer(f"🛑 Стоп маркет - {stop_market_basic}")
         await message.answer(f"↔️ Безубыточность - {stop_market_0_basic}")
         await message.answer(f"✅ Тейк-профит - {take_profit_basic}")
+        await message.answer(f"напоминаю :{level_price}")
         await message.answer("Данные сохранены в 💹основной💹")
         await state.clear()  # Выходим из состояния
     except Exception as e:
