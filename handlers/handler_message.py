@@ -267,56 +267,237 @@ async def cmd_o(message: Message, state: FSMContext):
             await message.delete()
             return
         await message.answer("работа с таблицей 💹основной💹")
-        await state.set_state(UserData.TABLE_2)  # Запоминаем контекст
-        await message.answer("не превышай лимит на покупку для уровня")
-        await message.answer("✏️ Введите данные для ОСНОВНОЙ : SBER;12;309,34;на что мой расчет или надежда?тренд-(вниз),план-(после дивидендов...)", parse_mode="HTML")
+        await state.set_state(UserData.TABLE_2_TICKER)  # Запоминаем контекст
+        await message.answer("Введи тикер", parse_mode="HTML")
+        # await message.answer("✏️ Введите данные для ОСНОВНОЙ : SBER;12;309,34;на что мой расчет или надежда?тренд-(вниз),план-(после дивидендов...)", parse_mode="HTML")
     except Exception as e:
         logi.err.info(f"cmd_o() в папке handlers/handler_message.py , Exception as e : {e}")
 
 
-@handler_message_router.message(UserData.TABLE_2)
-async def handle_table2_data_basic(message: Message, state: FSMContext):
+# 2. Шаг 1: Получаем тикер
+@handler_message_router.message(UserData.TABLE_2_TICKER)
+async def process_ticker(message: Message, state: FSMContext):
     try:
         if not is_admin(message.from_user.id):
             await message.delete()
             await state.clear()
             return
-        text = message.text.strip()
-        # Парсим данные (разделяем по ;)
-        parts = text.split(";", 3)  # Разбиваем на 4 части максимум
-        if len(parts) != 4:
-            await message.answer("Неверный формат!")
+        # Проверка на отмену переделать для кнопки
+        if message.text.strip().lower() in ["отмена", "cancel", "/cancel"]:
+            await state.clear()
+            await message.answer("❌ Операция отменена.")
             return
-        tiker, quantity, price, conclusion = parts
-        d_basic = pydantic_models.Lightning(tiker=tiker, action="покупка", quantity=quantity, price=price, conclusion=conclusion)
+        # Нужно прогнать тикер через пайдентик
+        tiker = message.text.strip().upper()
+        # Запоминаем тикер в "память" состояния
+        await state.update_data(tiker=tiker)
+        # читаю из памяти
+        data_tiker = await state.get_data()
+        tiker2 = data_tiker.get("tiker")
+        if tiker2 in dict_ticker_number:
+            num_str = dict_ticker_number[tiker2]
+            total_capital = Read(Nazvanie_operazii="", range=f"analystrade!AB{num_str}")[0]
+            related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{num_str}")[0]
+            operating_principle = Read(Nazvanie_operazii="", range=f"analystrade!AJ{num_str}")[0]
+            level_price = Read(Nazvanie_operazii="", range=f"analystrade!AK{num_str}")[0]
+        else:
+            total_capital = "нету"
+            related_products = "нету"
+            operating_principle = "нету"
+            level_price = "нету"
+        print(tiker2,related_products,level_price,operating_principle,total_capital)
+        await message.answer(f"Всего капитал : {total_capital}")
+        await message.answer(f"Влияет : {related_products}")
+        await message.answer(f"Принцип работы : {operating_principle}")
+        await message.answer(f"Ценовые уровни и кол-во : {level_price}")
+        # Переходим к следующему шагу
+        await state.set_state(UserData.TABLE_2_QUANTITY)
+        await message.answer(
+            f"✅ Тикер <b>{tiker}</b> сохранен.\n"
+            "✏️ <b>Шаг 2 из 4:</b> Введите <b>количество</b> лотов.",
+            parse_mode="HTML"
+        )
+    except Exception as e:
+        logi.err.info(f"process_ticker() Exception: {e}")
+
+
+# 3. Шаг 2: Получаем количество
+@handler_message_router.message(UserData.TABLE_2_QUANTITY)
+async def process_quantity(message: Message, state: FSMContext):
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            await state.clear()
+            return
+
+        if message.text.strip().lower() in ["отмена", "cancel", "/cancel"]:
+            await state.clear()
+            await message.answer("❌ Операция отменена.")
+            return
+
+        quantity = message.text.strip()
+        await state.update_data(quantity=quantity)
+
+        await state.set_state(UserData.TABLE_2_PRICE)
+        await message.answer(
+            f"✅ Количество: <b>{quantity}</b>.\n"
+            "✏️ <b>Шаг 3 из 4:</b> Введите <b>цену</b> покупки (например, 309.34 или 309,34).",
+            parse_mode="HTML"
+        )
+    except Exception as e:
+        logi.err.info(f"process_quantity() Exception: {e}")
+
+
+# 4. Шаг 3: Получаем цену
+@handler_message_router.message(UserData.TABLE_2_PRICE)
+async def process_price(message: Message, state: FSMContext):
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            await state.clear()
+            return
+
+        if message.text.strip().lower() in ["отмена", "cancel", "/cancel"]:
+            await state.clear()
+            await message.answer("❌ Операция отменена.")
+            return
+
+        # Заменяем запятую на точку для корректного float
+        price_str = message.text.strip().replace(",", ".")
+        try:
+            price_float = float(price_str)
+        except ValueError:
+            await message.answer("❌ Неверный формат цены. Введите число (например, 309.34). Попробуйте еще раз:")
+            return  # Не меняем состояние, ждем правильный ввод
+
+        await state.update_data(price=price_float)
+
+        await state.set_state(UserData.TABLE_2_CONCLUSION)
+        await message.answer(
+            f"✅ Цена: <b>{price_str}</b>.\n"
+            "✏️ <b>Шаг 4 из 4:</b> Введите <b>вывод</b> (на что ваш расчет?).",
+            parse_mode="HTML"
+        )
+    except Exception as e:
+        logi.err.info(f"process_price() Exception: {e}")
+
+
+# 5. Шаг 4: Получаем вывод и запускаем вашу логику сохранения
+@handler_message_router.message(UserData.TABLE_2_CONCLUSION)
+async def process_conclusion(message: Message, state: FSMContext):
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            await state.clear()
+            return
+
+        if message.text.strip().lower() in ["отмена", "cancel", "/cancel"]:
+            await state.clear()
+            await message.answer("❌ Операция отменена.")
+            return
+
+        conclusion = message.text.strip()
+
+        # Достаем все ранее сохраненные данные из FSM
+        data = await state.get_data()
+        tiker = data.get("tiker")
+        quantity = data.get("quantity")
+        price = data.get("price")  # Уже во float
+
+        # Создаем модель
+        d_basic = pydantic_models.Lightning(
+            tiker=tiker,
+            action="покупка",
+            quantity=quantity,
+            price=price,
+            conclusion=conclusion
+        )
+
         now = datetime.now()
-        # Форматированная дата "д.м.г"
         date_str = now.strftime("%Y-%m-%d")
-        # if d_light.action == "покупка":
+
+        # Ваши расчеты
         stop_market_basic = round(d_basic.price * 0.994, 2)
         stop_market_0_basic = round(d_basic.price * 1.001, 2)
         take_profit_basic = round(d_basic.price * 1.03, 2)
-        vivod_itog="zzz"
-        # сопутствующие товары определять из словаря ичитать из гугл таблиц
-        tiker_to_dict=d_basic.tiker.upper()
+        vivod_itog = "zzz"
+
+        # Чтение из Google Таблиц
+        tiker_to_dict = d_basic.tiker.upper()
         if tiker_to_dict in dict_ticker_number:
             i = dict_ticker_number[tiker_to_dict]
             related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
+            # Примечание: в вашем оригинальном коде level_price читался из той же ячейки AI.
+            # Если нужна другая колонка, измените букву (например, AJ)
             level_price = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
         else:
             related_products = "нет такого тикера!"
             level_price = "нет данных по уровням"
-        # сделать корректно и исправить, проверить
-        plan_deistvi_basic = [[d_basic.tiker,"основной",d_basic.action,date_str,d_basic.quantity,d_basic.price,d_basic.conclusion,vivod_itog,related_products,]]
-        Dobavlenie(Nazvanie_operazii="",diapozon_dannich="основной!A5",znachenie=plan_deistvi_basic,)
+
+        # Запись в Google Таблицы
+        plan_deistvi_basic = [
+            [d_basic.tiker, "основной", d_basic.action, date_str, d_basic.quantity, d_basic.price, d_basic.conclusion,
+             vivod_itog, related_products]
+        ]
+        Dobavlenie(Nazvanie_operazii="", diapozon_dannich="основной!A5", znachenie=plan_deistvi_basic)
+
+        # Отправка ответов пользователю
         await message.answer(f"🛑 Стоп маркет - {stop_market_basic}")
         await message.answer(f"↔️ Безубыточность - {stop_market_0_basic}")
         await message.answer(f"✅ Тейк-профит - {take_profit_basic}")
-        await message.answer(f"напоминаю :{level_price}")
-        await message.answer("Данные сохранены в 💹основной💹")
-        await state.clear()  # Выходим из состояния
+        await message.answer(f"Напоминаю: {level_price}")
+        await message.answer("✅ Данные успешно сохранены в 💹основной💹")
+
+        # Полностью очищаем состояние в самом конце
+        await state.clear()
+
     except Exception as e:
-        logi.err.info(f"handle_table2_data_basic() в папке handlers/handler_message.py , Exception as e : {e}")
+        logi.err.info(f"process_conclusion() Exception: {e}")
+        await state.clear()
+
+# @handler_message_router.message(UserData.TABLE_2)
+# async def handle_table2_data_basic(message: Message, state: FSMContext):
+#     try:
+#         if not is_admin(message.from_user.id):
+#             await message.delete()
+#             await state.clear()
+#             return
+#         text = message.text.strip()
+#         # Парсим данные (разделяем по ;)
+#         parts = text.split(";", 3)  # Разбиваем на 4 части максимум
+#         if len(parts) != 4:
+#             await message.answer("Неверный формат!")
+#             return
+#         tiker, quantity, price, conclusion = parts
+#         d_basic = pydantic_models.Lightning(tiker=tiker, action="покупка", quantity=quantity, price=price, conclusion=conclusion)
+#         now = datetime.now()
+#         # Форматированная дата "д.м.г"
+#         date_str = now.strftime("%Y-%m-%d")
+#         # if d_light.action == "покупка":
+#         stop_market_basic = round(d_basic.price * 0.994, 2)
+#         stop_market_0_basic = round(d_basic.price * 1.001, 2)
+#         take_profit_basic = round(d_basic.price * 1.03, 2)
+#         vivod_itog="zzz"
+#         # сопутствующие товары определять из словаря ичитать из гугл таблиц
+#         tiker_to_dict=d_basic.tiker.upper()
+#         if tiker_to_dict in dict_ticker_number:
+#             i = dict_ticker_number[tiker_to_dict]
+#             related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
+#             level_price = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
+#         else:
+#             related_products = "нет такого тикера!"
+#             level_price = "нет данных по уровням"
+#         # сделать корректно и исправить, проверить
+#         plan_deistvi_basic = [[d_basic.tiker,"основной",d_basic.action,date_str,d_basic.quantity,d_basic.price,d_basic.conclusion,vivod_itog,related_products,]]
+#         Dobavlenie(Nazvanie_operazii="",diapozon_dannich="основной!A5",znachenie=plan_deistvi_basic,)
+#         await message.answer(f"🛑 Стоп маркет - {stop_market_basic}")
+#         await message.answer(f"↔️ Безубыточность - {stop_market_0_basic}")
+#         await message.answer(f"✅ Тейк-профит - {take_profit_basic}")
+#         await message.answer(f"напоминаю :{level_price}")
+#         await message.answer("Данные сохранены в 💹основной💹")
+#         await state.clear()  # Выходим из состояния
+#     except Exception as e:
+#         logi.err.info(f"handle_table2_data_basic() в папке handlers/handler_message.py , Exception as e : {e}")
 #   ----------------КОНЕЦ СОСТОЯНИЯ ОСНОВНОЙ---------------------
 
 
