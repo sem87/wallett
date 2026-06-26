@@ -8,6 +8,7 @@ from aiogram.types import CallbackQuery
 from databazesql import databaze_sql_term
 from googleteable import DATA_TO_MONTH, MONTH_TO_COLUMN, Izmenenie, Read
 from logi import logi
+from aiogram.fsm.context import FSMContext
 
 # from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
 from utils import is_admin
@@ -389,3 +390,24 @@ async def pnl_btn_expenses_detail(callback: CallbackQuery):
 
 
 # ---------------------КОНЕЦ КНОПОК ДЛЯ PNL-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ ОТМЕНА----------------
+@callback_router.callback_query(F.data == "cancel_fsm")
+async def cancel_fsm_handler(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки отмены для FSM"""
+    try:
+        if not is_admin(callback.from_user.id):
+            await callback.message.delete()
+            return
+        # ✅ Правильное подтверждение нажатия кнопки
+        await callback.answer("Операция отменена", show_alert=False)
+        # Очищаем состояние FSM
+        await state.clear()
+        # Редактируем сообщение, чтобы убрать кнопку
+        try:
+            await callback.message.edit_text("❌ Операция отменена.Вы вышли из режима заполнения.")
+        except Exception  as e:
+            logi.err.info(f"cancel_fsm_handler() в handlers/callbackdata в убрать кнопку, Exception as e: {e}")
+            await callback.message.answer("❌ Операция отменена.")
+    except Exception as e:
+        logi.err.info(f"cancel_fsm_handler() в папке handlers/callbackdata, Exception as e: {e}")
+# ---------------------КОНЕЦ КНОПОК ДЛЯ ОТМЕНА-----------------

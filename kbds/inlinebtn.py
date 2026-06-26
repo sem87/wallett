@@ -65,3 +65,9 @@ def balance_btn_detail():
     keyboard_builder.button(text="резерв2", callback_data="rez2")
     keyboard_builder.adjust(1, 1, 1)
     return keyboard_builder.as_markup()
+
+def cancel_btn():
+    """Создает inline-кнопку 'Отмена' для FSM"""
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="❌ Отмена", callback_data="cancel_fsm")
+    return keyboard_builder.as_markup()

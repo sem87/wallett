@@ -14,7 +14,6 @@ from pydant import pydantic_models
 from states import UserData  # ← Чистый и понятный импорт
 from utils import is_admin
 
-
 # from databazesql import databaze_sql_term
 
 handler_message_router = Router()
@@ -268,23 +267,18 @@ async def cmd_o(message: Message, state: FSMContext):
             return
         await message.answer("работа с таблицей 💹основной💹")
         await state.set_state(UserData.TABLE_2_TICKER)  # Запоминаем контекст
-        await message.answer("Введи тикер", parse_mode="HTML")
+        await message.answer("Введи тикер", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"cmd_o() в папке handlers/handler_message.py , Exception as e : {e}")
 
 
-# Получаем тикер
 @handler_message_router.message(UserData.TABLE_2_TICKER)
 async def process_ticker(message: Message, state: FSMContext):
+    """Получаем тикер"""
     try:
         if not is_admin(message.from_user.id):
             await message.delete()
             await state.clear()
-            return
-        # Проверка на отмену переделать для кнопки
-        if message.text.strip().lower() in ["отмена", "cancel", "/cancel"]:
-            await state.clear()
-            await message.answer("❌ Операция отменена.")
             return
         # Нужно прогнать тикер через пайдентик
         tiker = message.text.strip().upper()
@@ -306,76 +300,67 @@ async def process_ticker(message: Message, state: FSMContext):
             f"💰 <b>Всего капитал:</b> {total_capital} руб\n"
             f"🔗 <b>Влияет:</b> {related_products}\n"
             f"⚙️ <b>Принцип работы:</b> {operating_principle}\n"
-            f"📈 <b>Ценовые уровни:</b> {level_price}"
-        )
+            f"📈 <b>Ценовые уровни:</b> {level_price}")
         await message.answer(text_data, parse_mode="HTML")
         await state.set_state(UserData.TABLE_2_CONCLUSION)
-        await message.answer(f"Введите <b>вывод</b>: на что расчет или надежда?тренд-(вниз),план-(после дивидендов...)",parse_mode="HTML")
+        await message.answer(f"<b>Введи вывод</b>:\nна что расчет или надежда?\nтренд-(вниз)\nплан-(после дивидендов...)",parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_ticker() в папке handlers/handler_message.py Exception: {e}")
 
 
-# Получаем вывод
 @handler_message_router.message(UserData.TABLE_2_CONCLUSION)
 async def process_conclusion(message: Message, state: FSMContext):
+    """Получаем вывод"""
     try:
         if not is_admin(message.from_user.id):
             await message.delete()
             await state.clear()
-            return
-        if message.text.strip().lower() in ["отмена", "cancel", "/cancel"]:
-            await state.clear()
-            await message.answer("❌ Операция отменена.")
             return
         conclusion = message.text.strip()
         # Запоминаем вывод в "память" состояния
         await state.update_data(conclusion=conclusion)
         # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_2_QUANTITY)
-        await message.answer(f"Введите <b>количество</b>", parse_mode="HTML")
+        await message.answer(f"Введи <b>количество</b>", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_conclusion() в папке handlers/handler_message.py ,Exception: {e}")
 
-# Получаем количество
+
 @handler_message_router.message(UserData.TABLE_2_QUANTITY)
 async def process_quantity(message: Message, state: FSMContext):
+    """Получаем количество"""
     try:
         if not is_admin(message.from_user.id):
             await message.delete()
             await state.clear()
             return
-        if message.text.strip().lower() in ["отмена", "cancel", "/cancel"]:
-            await state.clear()
-            await message.answer("❌ Операция отменена.")
-            return
         quantity = message.text.strip()
-        await state.update_data(quantity=quantity)
+        try:
+            quantity_int = int(quantity)
+        except ValueError:
+            await message.answer("❌ Неверный формат количества. Введи число целое число. Попробуйте еще раз...")
+            return  # Не меняем состояние, ждем правильный ввод
+        await state.update_data(quantity=quantity_int)
         await state.set_state(UserData.TABLE_2_PRICE)
-        await message.answer(f"Введите <b>цену</b> покупки (309.34 или 309,34)",parse_mode="HTML")
+        await message.answer(f"Введи <b>цену</b> покупки\n (285.34 или 285,34)",parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_quantity() в папке handlers/handler_message.py , Exception: {e}")
 
 
-# Получаем цену
 @handler_message_router.message(UserData.TABLE_2_PRICE)
 async def process_price(message: Message, state: FSMContext):
+    """Получаем цену"""
     try:
         if not is_admin(message.from_user.id):
             await message.delete()
             await state.clear()
             return
-
-        if message.text.strip().lower() in ["отмена", "cancel", "/cancel"]:
-            await state.clear()
-            await message.answer("❌ Операция отменена.")
-            return
-
         # Заменяем запятую на точку для корректного float
         price_str = message.text.strip().replace(",", ".")
         try:
             price_float = float(price_str)
         except ValueError:
-            await message.answer("❌ Неверный формат цены. Введите число (например, 309.34). Попробуйте еще раз:")
+            await message.answer("❌ Неверный формат цены. Введите число (например, 309.34). Попробуйте еще раз...")
             return  # Не меняем состояние, ждем правильный ввод
         await state.update_data(price=price_float)
 
@@ -413,64 +398,18 @@ async def process_price(message: Message, state: FSMContext):
         Dobavlenie(Nazvanie_operazii="", diapozon_dannich="основной!A5", znachenie=plan_deistvi_basic)
         # Отправка ответов пользователю
         response_text = (
-            f"✅ <b>Данные сохранены в 💹основной💹</b>\n\n"
-            f"🛑 <b>Стоп маркет:</b> {stop_market_basic}\n"
+            f"✅ <b>Данные сохранены</b>\n"
+            f"<b>💹основной💹</b>\n\n"
             f"↔️ <b>Безубыточность:</b> {stop_market_0_basic}\n"
-            f"✅ <b>Тейк-профит:</b> {take_profit_basic}\n\n"
-        )
+            f"🛑 <b>Стоп маркет -0,6%:</b> {stop_market_basic}\n"
+            f"✅ <b>Тейк-профит 3%:</b> {take_profit_basic}\n\n")
         await message.answer(response_text, parse_mode="HTML")
         # Полностью очищаем состояние в самом конце
         await state.clear()
     except Exception as e:
         logi.err.info(f"process_price() в папке handlers/handler_message.py , Exception: {e}")
         await state.clear()
-
-# @handler_message_router.message(UserData.TABLE_2)
-# async def handle_table2_data_basic(message: Message, state: FSMContext):
-#     try:
-#         if not is_admin(message.from_user.id):
-#             await message.delete()
-#             await state.clear()
-#             return
-#         text = message.text.strip()
-#         # Парсим данные (разделяем по ;)
-#         parts = text.split(";", 3)  # Разбиваем на 4 части максимум
-#         if len(parts) != 4:
-#             await message.answer("Неверный формат!")
-#             return
-#         tiker, quantity, price, conclusion = parts
-#         d_basic = pydantic_models.Lightning(tiker=tiker, action="покупка", quantity=quantity, price=price, conclusion=conclusion)
-#         now = datetime.now()
-#         # Форматированная дата "д.м.г"
-#         date_str = now.strftime("%Y-%m-%d")
-#         # if d_light.action == "покупка":
-#         stop_market_basic = round(d_basic.price * 0.994, 2)
-#         stop_market_0_basic = round(d_basic.price * 1.001, 2)
-#         take_profit_basic = round(d_basic.price * 1.03, 2)
-#         vivod_itog="zzz"
-#         # сопутствующие товары определять из словаря ичитать из гугл таблиц
-#         tiker_to_dict=d_basic.tiker.upper()
-#         if tiker_to_dict in dict_ticker_number:
-#             i = dict_ticker_number[tiker_to_dict]
-#             related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
-#             level_price = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
-#         else:
-#             related_products = "нет такого тикера!"
-#             level_price = "нет данных по уровням"
-#         # сделать корректно и исправить, проверить
-#         plan_deistvi_basic = [[d_basic.tiker,"основной",d_basic.action,date_str,d_basic.quantity,d_basic.price,d_basic.conclusion,vivod_itog,related_products,]]
-#         Dobavlenie(Nazvanie_operazii="",diapozon_dannich="основной!A5",znachenie=plan_deistvi_basic,)
-#         await message.answer(f"🛑 Стоп маркет - {stop_market_basic}")
-#         await message.answer(f"↔️ Безубыточность - {stop_market_0_basic}")
-#         await message.answer(f"✅ Тейк-профит - {take_profit_basic}")
-#         await message.answer(f"напоминаю :{level_price}")
-#         await message.answer("Данные сохранены в 💹основной💹")
-#         await state.clear()  # Выходим из состояния
-#     except Exception as e:
-#         logi.err.info(f"handle_table2_data_basic() в папке handlers/handler_message.py , Exception as e : {e}")
 #   ----------------КОНЕЦ СОСТОЯНИЯ ОСНОВНОЙ---------------------
-
-
 #   ----------------НАЧАЛО СОСТОЯНИЯ СОСТАВ ПОРТФЕЛЯ--------------------
 # Команда /c — переключаемся в состояние для таблицы 4
 # входим в состояние
