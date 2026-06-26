@@ -178,8 +178,6 @@ async def compound_btn(message: types.Message):
 
 
 #   ----------------НАЧАЛО СОСТОЯНИЯ МОЛНИЯ--------------------------
-# Команда /m — переключаемся в состояние для таблицы 1
-# входим в состояние
 @handler_message_router.message(F.text == "/m")
 async def cmd_m(message: Message, state: FSMContext):
     """СОСТОЯНИЕ /m ВНОСИМ ДАННЫЕ В молнию"""
@@ -188,70 +186,207 @@ async def cmd_m(message: Message, state: FSMContext):
             await message.delete()
             return
         await message.answer("работа с таблицей ⚡⚡⚡ молния ⚡⚡⚡")
-        await state.set_state(UserData.TABLE_1)  # 🔑 Запоминаем контекст
-        await message.answer("✏️ Введите данные для таблицы : SBER;b or s;12;309,34;вывод", parse_mode="HTML")
+        await state.set_state(UserData.TABLE_1_TICKER)  # Запоминаем контекст
+        await message.answer("Введи тикер", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"cmd_m() в папке handlers/handler_message.py , Exception as e : {e}")
 
 
-@handler_message_router.message(UserData.TABLE_1)
-async def handle_table1_data(message: Message, state: FSMContext):
+@handler_message_router.message(UserData.TABLE_1_TICKER)
+async def process_m_ticker(message: Message, state: FSMContext):
+    """Получаем тикер"""
     try:
         if not is_admin(message.from_user.id):
             await message.delete()
             await state.clear()
             return
-        text = message.text.strip()
-        # Парсим данные (разделяем по ;)
-        parts = text.split(";", 4)  # Разбиваем на 5 части максимум
-        if len(parts) != 5:
-            await message.answer("Неверный формат!")
-            return
-        tiker, action, quantity, price, conclusion = parts
-        d_light = pydantic_models.Lightning(
-            tiker=tiker, action=action, quantity=quantity, price=price, conclusion=conclusion
-        )
-        now = datetime.now()
-        # Форматированная дата "д.м.г"
-        date_str = now.strftime("%Y-%m-%d")
-        if d_light.action == "покупка":
-            stop_market = round(d_light.price * 0.994, 2)
-            stop_market_0 = round(d_light.price * 1.001, 2)
-            take_profit = round(d_light.price * 1.03, 2)
-        elif d_light.action == "продажа":
-            stop_market = round(d_light.price * 1.006, 2)
-            stop_market_0 = round(d_light.price * 0.999, 2)
-            take_profit = round(d_light.price * 0.97, 2)
+        # Нужно прогнать тикер через пайдентик
+        tiker = message.text.strip().upper()
+        # Запоминаем тикер в "память" состояния
+        await state.update_data(tiker=tiker)
+        if tiker in dict_ticker_number:
+            num_str = dict_ticker_number[tiker]
+            total_capital = Read(Nazvanie_operazii="", range=f"analystrade!AB{num_str}")[0]
+            related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{num_str}")[0]
+            operating_principle = Read(Nazvanie_operazii="", range=f"analystrade!AJ{num_str}")[0]
+            level_price = Read(Nazvanie_operazii="", range=f"analystrade!AK{num_str}")[0]
         else:
-            logi.inf.info(
-                f"handle_table1_data() в папке handlers/handler_message.py , не правильно написано {d_light.action}"
-            )
-        plan_deistvi = [
-            [
-                d_light.tiker,
-                "молния",
-                d_light.action,
-                date_str,
-                d_light.quantity,
-                d_light.price,
-                stop_market,
-                stop_market_0,
-                take_profit,
-                d_light.conclusion,
-            ]
-        ]
-        Dobavlenie(
-            Nazvanie_operazii="",
-            diapozon_dannich="молния!A5",
-            znachenie=plan_deistvi,
-        )
-        await message.answer(f"🛑 Стоп маркет - {stop_market}")
-        await message.answer(f"↔️ Безубыточность - {stop_market_0}")
-        await message.answer(f"✅ Тейк-профит - {take_profit}")
-        await message.answer("Данные сохранены в молния")
-        await state.clear()  # Выходим из состояния
+            total_capital = "нету"
+            related_products = "нету"
+            operating_principle = "нету"
+            level_price = "нету"
+        text_data = (
+            f"📊 <b>Данные по тикеру {tiker}:</b>\n\n"
+            f"🔗 <b>Влияет:</b> {related_products}\n"
+            f"⚙️ <b>Принцип работы:</b> {operating_principle}\n")
+            # f"📈 <b>Ценовые уровни:</b> {level_price}")   f"💰 <b>Всего капитал:</b> {total_capital} руб\n"
+        await message.answer(text_data, parse_mode="HTML")
+        await state.set_state(UserData.TABLE_1_NEWS)
+        await message.answer(f"<b>На какой новости сделка?</b>:\n",parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
-        logi.err.info(f"handle_table1_data() в папке handlers/handler_message.py , Exception as e : {e}")
+        logi.err.info(f"process_m_ticker() в папке handlers/handler_message.py Exception: {e}")
+
+
+@handler_message_router.message(UserData.TABLE_1_NEWS)
+async def process_m_news(message: Message, state: FSMContext):
+    """Получаем новости"""
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            await state.clear()
+            return
+        news = message.text.strip().lower()
+        # Запоминаем вывод в "память" состояния
+        await state.update_data(news=news)
+        # Переходим к следующему шагу
+        await state.set_state(UserData.TABLE_1_TREND_DAYS)
+        await message.answer(f"Введи <b>трэнд День</b>", parse_mode="HTML",reply_markup=inlinebtn.input_btn_up_down_days())
+    except Exception as e:
+        logi.err.info(f"process_m_news() в папке handlers/handler_message.py ,Exception: {e}")
+
+
+@handler_message_router.message(UserData.TABLE_1_TREND_DAYS)
+async def process_m_trend_days(message: Message, state: FSMContext):
+    """Получаем трэнд день"""
+    try:
+        # Достаём ВСЕ данные
+        data = await state.get_data()
+        # Достаём конкретное значение
+        direction = data.get("trend_day")
+        await message.answer(f"Трэнд день: {direction}")
+        # # Переходим к следующему шагу
+        await state.set_state(UserData.TABLE_1_TREND_HOUR)
+        await message.answer(f"Введи <b>трэнд Час</b>", parse_mode="HTML",reply_markup=inlinebtn.input_btn_up_down_hour())
+    except Exception as e:
+        logi.err.info(f"process_m_trend_days() в папке handlers/handler_message.py ,Exception: {e}")
+
+
+@handler_message_router.message(UserData.TABLE_1_TREND_HOUR)
+async def process_m_trend_hour(message: Message, state: FSMContext):
+    """Получаем трэнд час"""
+    try:
+        # Достаём ВСЕ данные
+        data = await state.get_data()
+        # Достаём конкретное значение
+        direction_hour = data.get("trend_hour")
+        await message.answer(f"Трэнд час: {direction_hour}")
+        # # Переходим к следующему шагу
+        await state.set_state(UserData.TABLE_1_TREND_5MIN)
+        await message.answer(f"Введи <b>трэнд 5мин</b>", parse_mode="HTML",reply_markup=inlinebtn.input_btn_up_down_5min())
+    except Exception as e:
+        logi.err.info(f"process_m_trend_hour() в папке handlers/handler_message.py ,Exception: {e}")
+
+
+@handler_message_router.message(UserData.TABLE_1_TREND_5MIN)
+async def process_m_trend_5min(message: Message, state: FSMContext):
+    """Получаем трэнд 5мин"""
+    try:
+        # Достаём ВСЕ данные
+        data = await state.get_data()
+        # Достаём конкретное значение
+        direction_5min = data.get("trend_5min")
+        await message.answer(f"Трэнд 5мин: {direction_5min}")
+        # # Переходим к следующему шагу
+        await message.answer(f"&&&&&&&&&&&&&&&&&: {data}")
+        await state.set_state(UserData.TABLE_1_ATTENDANT)
+        await message.answer(f"Введи <b>как ведут себя сопутствующие факторы?</b>", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+    except Exception as e:
+        logi.err.info(f"process_m_trend_5min() в папке handlers/handler_message.py ,Exception: {e}")
+
+
+@handler_message_router.message(UserData.TABLE_1_ATTENDANT)
+async def process_m_attendant(message: Message, state: FSMContext):
+    """Получаем сопутствующие факторы"""
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            await state.clear()
+            return
+        attendant = message.text.strip().lower()
+        # Запоминаем вывод в "память" состояния
+        await state.update_data(attendant=attendant)
+        data = await state.get_data()
+        await message.answer(f"&&&&&&&&&&&&&&&&&: {data}")
+        # # Переходим к следующему шагу
+        # await state.set_state(UserData.TABLE_1_TREND_DAYS)
+        # await message.answer(f"Введи <b>трэнд День</b>", parse_mode="HTML",reply_markup=inlinebtn.input_btn_up_down_days())
+    except Exception as e:
+        logi.err.info(f"process_m_attendant() в папке handlers/handler_message.py ,Exception: {e}")
+
+# # Команда /m — переключаемся в состояние для таблицы 1
+# # входим в состояние
+# @handler_message_router.message(F.text == "/m")
+# async def cmd_m(message: Message, state: FSMContext):
+#     """СОСТОЯНИЕ /m ВНОСИМ ДАННЫЕ В молнию"""
+#     try:
+#         if not is_admin(message.from_user.id):
+#             await message.delete()
+#             return
+#         await message.answer("работа с таблицей ⚡⚡⚡ молния ⚡⚡⚡")
+#         await state.set_state(UserData.TABLE_1)  # 🔑 Запоминаем контекст
+#         await message.answer("✏️ Введите данные для таблицы : SBER;b or s;12;309,34;вывод", parse_mode="HTML")
+#     except Exception as e:
+#         logi.err.info(f"cmd_m() в папке handlers/handler_message.py , Exception as e : {e}")
+#
+#
+# @handler_message_router.message(UserData.TABLE_1)
+# async def handle_table1_data(message: Message, state: FSMContext):
+#     try:
+#         if not is_admin(message.from_user.id):
+#             await message.delete()
+#             await state.clear()
+#             return
+#         text = message.text.strip()
+#         # Парсим данные (разделяем по ;)
+#         parts = text.split(";", 4)  # Разбиваем на 5 части максимум
+#         if len(parts) != 5:
+#             await message.answer("Неверный формат!")
+#             return
+#         tiker, action, quantity, price, conclusion = parts
+#         d_light = pydantic_models.Lightning(
+#             tiker=tiker, action=action, quantity=quantity, price=price, conclusion=conclusion
+#         )
+#         now = datetime.now()
+#         # Форматированная дата "д.м.г"
+#         date_str = now.strftime("%Y-%m-%d")
+#         if d_light.action == "покупка":
+#             stop_market = round(d_light.price * 0.994, 2)
+#             stop_market_0 = round(d_light.price * 1.001, 2)
+#             take_profit = round(d_light.price * 1.03, 2)
+#         elif d_light.action == "продажа":
+#             stop_market = round(d_light.price * 1.006, 2)
+#             stop_market_0 = round(d_light.price * 0.999, 2)
+#             take_profit = round(d_light.price * 0.97, 2)
+#         else:
+#             logi.inf.info(
+#                 f"handle_table1_data() в папке handlers/handler_message.py , не правильно написано {d_light.action}"
+#             )
+#         plan_deistvi = [
+#             [
+#                 d_light.tiker,
+#                 "молния",
+#                 d_light.action,
+#                 date_str,
+#                 d_light.quantity,
+#                 d_light.price,
+#                 stop_market,
+#                 stop_market_0,
+#                 take_profit,
+#                 d_light.conclusion,
+#             ]
+#         ]
+#         Dobavlenie(
+#             Nazvanie_operazii="",
+#             diapozon_dannich="молния!A5",
+#             znachenie=plan_deistvi,
+#         )
+#         await message.answer(f"🛑 Стоп маркет - {stop_market}")
+#         await message.answer(f"↔️ Безубыточность - {stop_market_0}")
+#         await message.answer(f"✅ Тейк-профит - {take_profit}")
+#         await message.answer("Данные сохранены в молния")
+#         await state.clear()  # Выходим из состояния
+#     except Exception as e:
+#         logi.err.info(f"handle_table1_data() в папке handlers/handler_message.py , Exception as e : {e}")
 
 
 #   ----------------КОНЕЦ СОСТОЯНИЯ МОЛНИЯ-----------------------

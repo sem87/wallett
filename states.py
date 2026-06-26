@@ -4,10 +4,20 @@ from aiogram.fsm.state import State, StatesGroup
 
 
 class UserData(StatesGroup):
-    TABLE_1 = State()  # После /m — ждём данные для таблицы молния
+    # ======начало состояния для молния ========
+    # TABLE_1 = State()  # После /m — ждём данные для таблицы молния
+    TABLE_1_TICKER = State()  # Шаг 1: Ожидание тикера
+    TABLE_1_NEWS = State()  # Шаг 2: Ожидание новости
+    TABLE_1_TREND_DAYS = State()  # Шаг 3: Ожидание тренд день
+    TABLE_1_TREND_HOUR = State()  # Шаг 4: Ожидание тренд час
+    TABLE_1_TREND_5MIN = State()  # Шаг 5: Ожидание тренд 5мин
+    TABLE_1_ATTENDANT = State()  # Шаг 6: Ожидание сопутствующие
+    TABLE_1_VOLUME = State()  # Шаг 7: Ожидание объем
+    TABLE_1_CUP = State()  # Шаг 8: Ожидание стакан
+    TABLE_1_PATTERN = State()  # Шаг 9: Ожидание паттерна
+    TABLE_1_CONCLUSION = State()  # Шаг 10: Ожидание вывода/заключения
+    # ======конец состояния для молния =========
     # ======начало состояния для основной ======
-    #TABLE_2 = State()  # После /o — ждём данные для таблицы основной
-    # TABLE_2 = State()  # Старое состояние можно удалить
     TABLE_2_TICKER = State()      # Шаг 1: Ожидание тикера
     TABLE_2_QUANTITY = State()    # Шаг 2: Ожидание количества
     TABLE_2_PRICE = State()       # Шаг 3: Ожидание цены

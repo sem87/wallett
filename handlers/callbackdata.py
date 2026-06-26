@@ -9,7 +9,7 @@ from databazesql import databaze_sql_term
 from googleteable import DATA_TO_MONTH, MONTH_TO_COLUMN, Izmenenie, Read
 from logi import logi
 from aiogram.fsm.context import FSMContext
-
+from handlers.handler_message import process_m_trend_days,process_m_trend_hour,process_m_trend_5min
 # from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
 from utils import is_admin
 
@@ -411,3 +411,94 @@ async def cancel_fsm_handler(callback: CallbackQuery, state: FSMContext):
     except Exception as e:
         logi.err.info(f"cancel_fsm_handler() в папке handlers/callbackdata, Exception as e: {e}")
 # ---------------------КОНЕЦ КНОПОК ДЛЯ ОТМЕНА-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ вверх/вниз ДЕНЬ----------------
+@callback_router.callback_query(F.data == "up_days")
+async def direction_up_handler_days(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки 'вверх'"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: вверх 📈", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(trend_day="вверх")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_trend_days(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_up_handler_days() в папке handlers/callbackdata, Exception as e: {e}")
+
+
+@callback_router.callback_query(F.data == "down_days")
+async def direction_down_handler_days(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки 'вниз'"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: вниз 📉", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(trend_day="вниз")
+        # Может делать комент а кнопку уничтожать ??????????????
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_trend_days(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_down_handler_days() в папке handlers/callbackdata, Exception as e: {e}")
+# ---------------------КОНЕЦ КНОПОК ДЛЯ вверх/вниз ДЕНЬ-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ вверх/вниз ЧАС----------------
+@callback_router.callback_query(F.data == "up_hour")
+async def direction_up_handler_hour(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки 'вверх'"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: вверх 📈", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(trend_hour="вверх")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_trend_hour(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_up_handler_hour() в папке handlers/callbackdata, Exception as e: {e}")
+
+
+@callback_router.callback_query(F.data == "down_hour")
+async def direction_down_handler_hour(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки 'вниз'"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: вниз 📉", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(trend_hour="вниз")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_trend_hour(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_down_handler_hour() в папке handlers/callbackdata, Exception as e: {e}")
+# ---------------------КОНЕЦ КНОПОК ДЛЯ вверх/вниз ЧАС-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ вверх/вниз 5МИН----------------
+@callback_router.callback_query(F.data == "up_5min")
+async def direction_up_handler_5min(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки 'вверх'"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: вверх 📈", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(trend_5min="вверх")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_trend_5min(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_up_handler_5min() в папке handlers/callbackdata, Exception as e: {e}")
+
+
+@callback_router.callback_query(F.data == "down_5min")
+async def direction_down_handler_5min(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки 'вниз'"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: вниз 📉", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(trend_5min="вниз")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_trend_5min(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_down_handler_5min() в папке handlers/callbackdata, Exception as e: {e}")
+# ---------------------КОНЕЦ КНОПОК ДЛЯ вверх/вниз 5МИН-----------------

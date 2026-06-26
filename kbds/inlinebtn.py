@@ -71,3 +71,24 @@ def cancel_btn():
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(text="❌ Отмена", callback_data="cancel_fsm")
     return keyboard_builder.as_markup()
+
+def input_btn_up_down_days():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="вверх", callback_data="up_days")
+    keyboard_builder.button(text="вниз", callback_data="down_days")
+    keyboard_builder.adjust(2)
+    return keyboard_builder.as_markup()
+
+def input_btn_up_down_hour():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="вверх", callback_data="up_hour")
+    keyboard_builder.button(text="вниз", callback_data="down_hour")
+    keyboard_builder.adjust(2)
+    return keyboard_builder.as_markup()
+
+def input_btn_up_down_5min():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="вверх", callback_data="up_5min")
+    keyboard_builder.button(text="вниз", callback_data="down_5min")
+    keyboard_builder.adjust(2)
+    return keyboard_builder.as_markup()
