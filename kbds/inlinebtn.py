@@ -72,6 +72,13 @@ def cancel_btn():
     keyboard_builder.button(text="❌ Отмена", callback_data="cancel_fsm")
     return keyboard_builder.as_markup()
 
+def input_btn_buy_or_sell():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="покупка", callback_data="btn_buy")
+    keyboard_builder.button(text="продажа", callback_data="btn_sell")
+    keyboard_builder.adjust(2)
+    return keyboard_builder.as_markup()
+
 def input_btn_up_down_days():
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(text="вверх", callback_data="up_days")
@@ -91,4 +98,13 @@ def input_btn_up_down_5min():
     keyboard_builder.button(text="вверх", callback_data="up_5min")
     keyboard_builder.button(text="вниз", callback_data="down_5min")
     keyboard_builder.adjust(2)
+    return keyboard_builder.as_markup()
+
+def input_btn_volume():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="низкий", callback_data="volume_short")
+    keyboard_builder.button(text="средний", callback_data="volume_average")
+    keyboard_builder.button(text="выше среднего", callback_data="volume_above_average")
+    keyboard_builder.button(text="огромный", callback_data="volume_super")
+    keyboard_builder.adjust(2,2)
     return keyboard_builder.as_markup()

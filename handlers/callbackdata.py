@@ -9,7 +9,7 @@ from databazesql import databaze_sql_term
 from googleteable import DATA_TO_MONTH, MONTH_TO_COLUMN, Izmenenie, Read
 from logi import logi
 from aiogram.fsm.context import FSMContext
-from handlers.handler_message import process_m_trend_days,process_m_trend_hour,process_m_trend_5min
+from handlers.handler_message import process_m_trend_days,process_m_trend_hour,process_m_trend_5min,process_m_volume,process_m_btn_buy_sell
 # from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
 from utils import is_admin
 
@@ -502,3 +502,93 @@ async def direction_down_handler_5min(callback: CallbackQuery, state: FSMContext
     except Exception as e:
         logi.err.info(f"direction_down_handler_5min() в папке handlers/callbackdata, Exception as e: {e}")
 # ---------------------КОНЕЦ КНОПОК ДЛЯ вверх/вниз 5МИН-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ объем----------------
+@callback_router.callback_query(F.data == "volume_short")
+async def direction_volume_short(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки объем низкий"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: объем низкий", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(volume="низкий")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_volume(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_volume_short() в папке handlers/callbackdata, Exception as e: {e}")
+
+
+@callback_router.callback_query(F.data == "volume_average")
+async def direction_volume_average(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки объем средний"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: объем средний", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(volume="средний")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_volume(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_volume_average() в папке handlers/callbackdata, Exception as e: {e}")
+
+
+@callback_router.callback_query(F.data == "volume_above_average")
+async def direction_volume_above_average(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки объем выше среднего"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: объем выше среднего", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(volume="выше среднего")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_volume(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_volume_above_average() в папке handlers/callbackdata, Exception as e: {e}")
+
+
+@callback_router.callback_query(F.data == "volume_super")
+async def direction_volume_super(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки объем огромный"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: объем огромный", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(volume="огромный")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_volume(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_volume_super() в папке handlers/callbackdata, Exception as e: {e}")
+# ---------------------КОНЕЦ КНОПОК ДЛЯ объем-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ покупка/продажа----------------
+@callback_router.callback_query(F.data == "btn_buy")
+async def direction_btn_buy(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки покупка"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: покупка", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(btn_buy_sell="покупка")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_btn_buy_sell(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_btn_buy() в папке handlers/callbackdata, Exception as e: {e}")
+
+
+@callback_router.callback_query(F.data == "btn_sell")
+async def direction_btn_sell(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки продажа"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Выбрал: продажа", show_alert=False)
+        # ✅ Сохраняем значение в FSM
+        await state.update_data(btn_buy_sell="продажа")
+        # ⚡ ВЫЗЫВАЕМ ФУНКЦИЮ НАПРЯМУЮ
+        # Передаем callback.message, так как функция ждет объект Message
+        await process_m_btn_buy_sell(callback.message, state)
+    except Exception as e:
+        logi.err.info(f"direction_btn_sell() в папке handlers/callbackdata, Exception as e: {e}")
+# ---------------------КОНЕЦ КНОПОК ДЛЯ покупка/продажа-----------------
