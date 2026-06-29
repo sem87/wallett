@@ -1,7 +1,7 @@
 from typing import Any
 
-from pydantic import BaseModel, field_validator
-
+from pydantic import BaseModel, field_validator,field_serializer
+from datetime import datetime
 
 # from typing import Optional
 
@@ -105,3 +105,40 @@ class Сompound(BaseModel):
         # Первая буква в верхний регистр
         action = action[0].upper() + action[1:] if action else ""
         return action
+
+
+class Molnia(BaseModel):
+    tiker: str
+    check: str
+    btn_buy_sell: str
+    quantity_int: int | None = None
+    price_float: float | None = None
+    stop_market: float | None = None
+    stop_market_0: float | None = None
+    take_profit: float | None = None
+    news: str
+    trend_day: str
+    trend_hour: str
+    trend_5min: str
+    attendant: str
+    volume: str
+    cup: str
+    pattern: str
+    conclusion: str
+    final_conclusion: str
+
+
+    @field_validator("news", "attendant", "volume", "cup", "conclusion", mode="before")
+    @classmethod
+    def normalize_conclusion(cls, v: Any) -> str:
+        """Нормализует вывод/заключение"""
+        text = str(v).strip().lower()
+        # Защита от пустых строк
+        if not text:
+            return ""
+        # Первая буква в верхний регистр, остальные остаются как есть
+        text = text[0].upper() + text[1:] if len(text) > 1 else text.upper()
+        # Добавление точки в конце (без дублирования)
+        if not text.endswith("."):
+            text += "."
+        return text

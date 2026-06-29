@@ -18,9 +18,8 @@ from utils import is_admin
 
 handler_message_router = Router()
 
-
 #   ----------------НАЧАЛО КОНСТАНТЫ И ФУНКЦИИ БИЗНЕС ЛОГИКИ-------------------------
-dict_ticker_number={
+dict_ticker_number = {
     "ROSN": 2,
     "TATN": 3,
     "LKOH": 4,
@@ -46,6 +45,7 @@ dict_ticker_number={
     "TGLD": 24,
     "USD": 25
 }
+
 
 def average_monthly(type_activity=18):
     """РАСЧИТЫВАЕТ СРЕДНИЕ ЗА 12 МЕС ДДС_РАСХОДЫ=18,ДДС_ДОХОДЫ=3,PNL_РАСХОДЫ=62,PNL_ДОХОДЫ=52"""
@@ -187,7 +187,7 @@ async def cmd_m(message: Message, state: FSMContext):
             return
         await message.answer("работа с таблицей ⚡⚡⚡ молния ⚡⚡⚡")
         await state.set_state(UserData.TABLE_1_TICKER)  # Запоминаем контекст
-        await message.answer("Введи тикер", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer("Введи тикер", parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"cmd_m() в папке handlers/handler_message.py , Exception as e : {e}")
 
@@ -219,10 +219,10 @@ async def process_m_ticker(message: Message, state: FSMContext):
             f"📊 <b>Данные по тикеру {tiker}:</b>\n\n"
             f"🔗 <b>Влияет:</b> {related_products}\n"
             f"⚙️ <b>Принцип работы:</b> {operating_principle}\n")
-            # f"📈 <b>Ценовые уровни:</b> {level_price}")   f"💰 <b>Всего капитал:</b> {total_capital} руб\n"
+        # f"📈 <b>Ценовые уровни:</b> {level_price}")   f"💰 <b>Всего капитал:</b> {total_capital} руб\n"
         await message.answer(text_data, parse_mode="HTML")
         await state.set_state(UserData.TABLE_1_BUY_OR_SELL)
-        await message.answer(f"<b>Выбери</b>:\n",parse_mode="HTML",reply_markup=inlinebtn.input_btn_buy_or_sell())
+        await message.answer(f"<b>Выбери</b>:\n", parse_mode="HTML", reply_markup=inlinebtn.input_btn_buy_or_sell())
     except Exception as e:
         logi.err.info(f"process_m_ticker() в папке handlers/handler_message.py Exception: {e}")
 
@@ -238,7 +238,8 @@ async def process_m_btn_buy_sell(message: Message, state: FSMContext):
         await message.answer(f"Выбрал: {btn_buy_sell}")
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_NEWS)
-        await message.answer(f"<b>На какой новости сделка?</b>:\n", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"<b>На какой новости сделка?</b>:\n", parse_mode="HTML",
+                             reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_m_btn_buy_sell() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -256,7 +257,8 @@ async def process_m_news(message: Message, state: FSMContext):
         await state.update_data(news=news)
         # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_TREND_DAYS)
-        await message.answer(f"Введи <b>трэнд День</b>", parse_mode="HTML",reply_markup=inlinebtn.input_btn_up_down_days())
+        await message.answer(f"Введи <b>трэнд День</b>", parse_mode="HTML",
+                             reply_markup=inlinebtn.input_btn_up_down_days())
     except Exception as e:
         logi.err.info(f"process_m_news() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -272,7 +274,8 @@ async def process_m_trend_days(message: Message, state: FSMContext):
         await message.answer(f"Трэнд день: {direction}")
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_TREND_HOUR)
-        await message.answer(f"Введи <b>трэнд Час</b>", parse_mode="HTML",reply_markup=inlinebtn.input_btn_up_down_hour())
+        await message.answer(f"Введи <b>трэнд Час</b>", parse_mode="HTML",
+                             reply_markup=inlinebtn.input_btn_up_down_hour())
     except Exception as e:
         logi.err.info(f"process_m_trend_days() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -288,7 +291,8 @@ async def process_m_trend_hour(message: Message, state: FSMContext):
         await message.answer(f"Трэнд час: {direction_hour}")
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_TREND_5MIN)
-        await message.answer(f"Введи <b>трэнд 5мин</b>", parse_mode="HTML",reply_markup=inlinebtn.input_btn_up_down_5min())
+        await message.answer(f"Введи <b>трэнд 5мин</b>", parse_mode="HTML",
+                             reply_markup=inlinebtn.input_btn_up_down_5min())
     except Exception as e:
         logi.err.info(f"process_m_trend_hour() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -304,7 +308,8 @@ async def process_m_trend_5min(message: Message, state: FSMContext):
         await message.answer(f"Трэнд 5мин: {direction_5min}")
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_ATTENDANT)
-        await message.answer(f"Введи <b>как ведут себя сопутствующие факторы?</b>", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"Введи <b>как ведут себя сопутствующие факторы?</b>", parse_mode="HTML",
+                             reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_m_trend_5min() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -322,7 +327,8 @@ async def process_m_attendant(message: Message, state: FSMContext):
         await state.update_data(attendant=attendant)
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_TREND_DAYS)
-        await message.answer(f"Введи <b>объем</b>\n(выше среднего? на <b>Часе</b>)", parse_mode="HTML",reply_markup=inlinebtn.input_btn_volume())
+        await message.answer(f"Введи <b>объем</b>\n(выше среднего? на <b>Часе</b>)", parse_mode="HTML",
+                             reply_markup=inlinebtn.input_btn_volume())
     except Exception as e:
         logi.err.info(f"process_m_attendant() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -338,7 +344,8 @@ async def process_m_volume(message: Message, state: FSMContext):
         await message.answer(f"Объем: {volume}")
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_CUP)
-        await message.answer(f"Какой <b>стакан?</b>\nкто <b>преобладает?</b>\nкакие <b>стенки?</b>\n", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"Какой <b>стакан?</b>\nкто <b>преобладает?</b>\nкакие <b>стенки?</b>\n",
+                             parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_m_volume() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -356,10 +363,10 @@ async def process_m_cup(message: Message, state: FSMContext):
         await state.update_data(cup=cup)
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_CONCLUSION)
-        await message.answer(f"Напиши <b>вывод</b>\nНужен только <b>смысл</b>\n", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"Напиши <b>вывод</b>\nНужен только <b>смысл</b>\n", parse_mode="HTML",
+                             reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_m_cup() в папке handlers/handler_message.py ,Exception: {e}")
-
 
 
 @handler_message_router.message(UserData.TABLE_1_CONCLUSION)
@@ -373,12 +380,9 @@ async def process_m_conclusion(message: Message, state: FSMContext):
         conclusion = message.text.strip().lower()
         # Запоминаем вывод в "память" состояния
         await state.update_data(conclusion=conclusion)
-        # data = await state.get_data()
-        # await message.answer(f"&&&&&&&&&&&&&&&&&: {data}")
-        # print(data)
         # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_QUANTITY)
-        await message.answer(f"Введи <b>количество</b>)", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"Введи <b>количество</b>)", parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_m_conclusion() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -401,7 +405,7 @@ async def process_m_quantity(message: Message, state: FSMContext):
         await state.update_data(quantity_int=quantity_int)
         # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_PRICE)
-        await message.answer(f"Введи <b>цену</b>", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"Введи <b>цену</b>", parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_m_quantity() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -422,141 +426,73 @@ async def process_m_price(message: Message, state: FSMContext):
             await message.answer("❌ Неверный формат цены. Введите число (например, 309.34). Попробуйте еще раз...")
             return  # Не меняем состояние, ждем правильный ввод
         await state.update_data(price_float=price_float)
-
-
-
         # Достаем все ранее сохраненные данные из FSM
         data = await state.get_data()
+        # ===========================================
         tiker = data.get("tiker")
+        check = "молния"
+        btn_buy_sell = data.get("btn_buy_sell")
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        quantity_int = data.get("quantity_int")
+        price_float = data.get("price_float")
+        # выяснить может быть делать после пайдентик
+        stop_market = round(price_float * 0.994, 2)
+        stop_market_0 = round(price_float * 1.001, 2)
+        take_profit = round(price_float * 1.03, 2)
+        # выяснить может быть делать после пайдентик
+        news = data.get("news")
+        trend_day = data.get("trend_day")
+        trend_hour = data.get("trend_hour")
+        trend_5min = data.get("trend_5min")
+        attendant = data.get("attendant")
+        volume = data.get("volume")
+        cup = data.get("cup")
+        pattern = "паттерны"
         conclusion = data.get("conclusion")
-        quantity = data.get("quantity")
-        price = data.get("price")  # Уже во float
-        # # Создаем модель
-        # d_basic = pydantic_models.Lightning(
-        #     tiker=tiker,
-        #     action="покупка",
-        #     quantity=quantity,
-        #     price=price,
-        #     conclusion=conclusion)
-        # now = datetime.now()
-        # date_str = now.strftime("%Y-%m-%d")
-        #
-        # # Ваши расчеты
-        # stop_market_basic = round(d_basic.price * 0.994, 2)
-        # stop_market_0_basic = round(d_basic.price * 1.001, 2)
-        # take_profit_basic = round(d_basic.price * 1.03, 2)
-        # vivod_itog = "zzz"
-        # if d_basic.tiker in dict_ticker_number:
-        #     i = dict_ticker_number[d_basic.tiker]
-        #     related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
-        # else:
-        #     related_products = "нет такого тикера!"
-        # # Запись в Google Таблицы
-        # plan_deistvi_basic = [
-        #     [d_basic.tiker, "основной", d_basic.action, date_str, d_basic.quantity, d_basic.price, d_basic.conclusion,
-        #      vivod_itog, related_products]
-        # ]
-        # Dobavlenie(Nazvanie_operazii="", diapozon_dannich="основной!A5", znachenie=plan_deistvi_basic)
-        # # Отправка ответов пользователю
-        # response_text = (
-        #     f"✅ <b>Данные сохранены</b>\n"
-        #     f"<b>💹основной💹</b>\n\n"
-        #     f"↔️ <b>Безубыточность:</b> {stop_market_0_basic}\n"
-        #     f"🛑 <b>Стоп маркет -0,6%:</b> {stop_market_basic}\n"
-        #     f"✅ <b>Тейк-профит 3%:</b> {take_profit_basic}\n\n")
-        # await message.answer(response_text, parse_mode="HTML")
-        # # Полностью очищаем состояние в самом конце
-        # await state.clear()
-        # # # Переходим к следующему шагу
-        # # await state.set_state(UserData.TABLE_1_PRICE)
-        # # await message.answer(f"Введи <b>цену</b>", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        final_conclusion = "итог"
+        # Создаем модель
+        m_basic = pydantic_models.Molnia(tiker=tiker, check=check, btn_buy_sell=btn_buy_sell,
+                                         quantity_int=quantity_int, price_float=price_float, stop_market=stop_market,
+                                         stop_market_0=stop_market_0,
+                                         take_profit=take_profit, news=news, trend_day=trend_day, trend_hour=trend_hour,
+                                         trend_5min=trend_5min,
+                                         attendant=attendant, volume=volume, cup=cup, pattern=pattern,
+                                         conclusion=conclusion, final_conclusion=final_conclusion)
+        # Запись в Google Таблицы
+        plan_deistvi_m_basic = [
+            [m_basic.tiker,
+             m_basic.check,
+             m_basic.btn_buy_sell,
+             date_str,
+             m_basic.quantity_int,
+             m_basic.price_float,
+             m_basic.stop_market,
+             m_basic.stop_market_0,
+             m_basic.take_profit,
+             m_basic.news,
+             m_basic.trend_day,
+             m_basic.trend_hour,
+             m_basic.trend_5min,
+             m_basic.attendant,
+             m_basic.volume,
+             m_basic.cup,
+             m_basic.pattern,
+             m_basic.conclusion,
+             m_basic.final_conclusion]
+        ]
+        Dobavlenie(Nazvanie_operazii="", diapozon_dannich="молния!A5", znachenie=plan_deistvi_m_basic)
+        # Отправка ответов пользователю
+        response_text = (
+            f"✅ <b>Данные сохранены</b>\n"
+            f"<b>молния</b>\n\n"
+            f"↔️ <b>Безубыточность:</b> {m_basic.stop_market_0}\n"
+            f"🛑 <b>Стоп маркет -0,6%:</b> {m_basic.stop_market}\n"
+            f"✅ <b>Тейк-профит 3%:</b> {m_basic.take_profit}\n\n")
+        await message.answer(response_text, parse_mode="HTML")
+        # Полностью очищаем состояние в самом конце
+        await state.clear()
     except Exception as e:
         logi.err.info(f"process_m_price() в папке handlers/handler_message.py ,Exception: {e}")
-
-
-
-
-
-# {'tiker': 'ROSN', 'btn_buy_sell': 'покупка', 'news': 'нет бензина', 'trend_day': 'вверх', 'trend_hour': 'вверх',
-#  'trend_5min': 'вверх', 'attendant': 'рост', 'volume': 'средний', 'cup': 'быки преобладают. 320 трамплин',
-#  'conclusion': 'будет ожиотаж'}
-
-
-
-# # Команда /m — переключаемся в состояние для таблицы 1
-# # входим в состояние
-# @handler_message_router.message(F.text == "/m")
-# async def cmd_m(message: Message, state: FSMContext):
-#     """СОСТОЯНИЕ /m ВНОСИМ ДАННЫЕ В молнию"""
-#     try:
-#         if not is_admin(message.from_user.id):
-#             await message.delete()
-#             return
-#         await message.answer("работа с таблицей ⚡⚡⚡ молния ⚡⚡⚡")
-#         await state.set_state(UserData.TABLE_1)  # 🔑 Запоминаем контекст
-#         await message.answer("✏️ Введите данные для таблицы : SBER;b or s;12;309,34;вывод", parse_mode="HTML")
-#     except Exception as e:
-#         logi.err.info(f"cmd_m() в папке handlers/handler_message.py , Exception as e : {e}")
-#
-#
-# @handler_message_router.message(UserData.TABLE_1)
-# async def handle_table1_data(message: Message, state: FSMContext):
-#     try:
-#         if not is_admin(message.from_user.id):
-#             await message.delete()
-#             await state.clear()
-#             return
-#         text = message.text.strip()
-#         # Парсим данные (разделяем по ;)
-#         parts = text.split(";", 4)  # Разбиваем на 5 части максимум
-#         if len(parts) != 5:
-#             await message.answer("Неверный формат!")
-#             return
-#         tiker, action, quantity, price, conclusion = parts
-#         d_light = pydantic_models.Lightning(
-#             tiker=tiker, action=action, quantity=quantity, price=price, conclusion=conclusion
-#         )
-#         now = datetime.now()
-#         # Форматированная дата "д.м.г"
-#         date_str = now.strftime("%Y-%m-%d")
-#         if d_light.action == "покупка":
-#             stop_market = round(d_light.price * 0.994, 2)
-#             stop_market_0 = round(d_light.price * 1.001, 2)
-#             take_profit = round(d_light.price * 1.03, 2)
-#         elif d_light.action == "продажа":
-#             stop_market = round(d_light.price * 1.006, 2)
-#             stop_market_0 = round(d_light.price * 0.999, 2)
-#             take_profit = round(d_light.price * 0.97, 2)
-#         else:
-#             logi.inf.info(
-#                 f"handle_table1_data() в папке handlers/handler_message.py , не правильно написано {d_light.action}"
-#             )
-#         plan_deistvi = [
-#             [
-#                 d_light.tiker,
-#                 "молния",
-#                 d_light.action,
-#                 date_str,
-#                 d_light.quantity,
-#                 d_light.price,
-#                 stop_market,
-#                 stop_market_0,
-#                 take_profit,
-#                 d_light.conclusion,
-#             ]
-#         ]
-#         Dobavlenie(
-#             Nazvanie_operazii="",
-#             diapozon_dannich="молния!A5",
-#             znachenie=plan_deistvi,
-#         )
-#         await message.answer(f"🛑 Стоп маркет - {stop_market}")
-#         await message.answer(f"↔️ Безубыточность - {stop_market_0}")
-#         await message.answer(f"✅ Тейк-профит - {take_profit}")
-#         await message.answer("Данные сохранены в молния")
-#         await state.clear()  # Выходим из состояния
-#     except Exception as e:
-#         logi.err.info(f"handle_table1_data() в папке handlers/handler_message.py , Exception as e : {e}")
 
 
 #   ----------------КОНЕЦ СОСТОЯНИЯ МОЛНИЯ-----------------------
@@ -572,7 +508,7 @@ async def cmd_o(message: Message, state: FSMContext):
             return
         await message.answer("работа с таблицей 💹основной💹")
         await state.set_state(UserData.TABLE_2_TICKER)  # Запоминаем контекст
-        await message.answer("Введи тикер", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer("Введи тикер", parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"cmd_o() в папке handlers/handler_message.py , Exception as e : {e}")
 
@@ -608,7 +544,9 @@ async def process_ticker(message: Message, state: FSMContext):
             f"📈 <b>Ценовые уровни:</b> {level_price}")
         await message.answer(text_data, parse_mode="HTML")
         await state.set_state(UserData.TABLE_2_CONCLUSION)
-        await message.answer(f"<b>Введи вывод</b>:\nна что расчет или надежда?\nтренд-(вниз)\nплан-(после дивидендов...)",parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(
+            f"<b>Введи вывод</b>:\nна что расчет или надежда?\nтренд-(вниз)\nплан-(после дивидендов...)",
+            parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_ticker() в папке handlers/handler_message.py Exception: {e}")
 
@@ -626,7 +564,7 @@ async def process_conclusion(message: Message, state: FSMContext):
         await state.update_data(conclusion=conclusion)
         # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_2_QUANTITY)
-        await message.answer(f"Введи <b>количество</b>", parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"Введи <b>количество</b>", parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_conclusion() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -647,7 +585,8 @@ async def process_quantity(message: Message, state: FSMContext):
             return  # Не меняем состояние, ждем правильный ввод
         await state.update_data(quantity=quantity_int)
         await state.set_state(UserData.TABLE_2_PRICE)
-        await message.answer(f"Введи <b>цену</b> покупки\n (285.34 или 285,34)",parse_mode="HTML",reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"Введи <b>цену</b> покупки\n (285.34 или 285,34)", parse_mode="HTML",
+                             reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_quantity() в папке handlers/handler_message.py , Exception: {e}")
 
@@ -672,7 +611,7 @@ async def process_price(message: Message, state: FSMContext):
         # Достаем все ранее сохраненные данные из FSM
         data = await state.get_data()
         tiker = data.get("tiker")
-        conclusion= data.get("conclusion")
+        conclusion = data.get("conclusion")
         quantity = data.get("quantity")
         price = data.get("price")  # Уже во float
         # Создаем модель
@@ -691,7 +630,7 @@ async def process_price(message: Message, state: FSMContext):
         take_profit_basic = round(d_basic.price * 1.03, 2)
         vivod_itog = "zzz"
         if d_basic.tiker in dict_ticker_number:
-            i = dict_ticker_number[d_basic.tiker ]
+            i = dict_ticker_number[d_basic.tiker]
             related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
         else:
             related_products = "нет такого тикера!"
@@ -714,6 +653,8 @@ async def process_price(message: Message, state: FSMContext):
     except Exception as e:
         logi.err.info(f"process_price() в папке handlers/handler_message.py , Exception: {e}")
         await state.clear()
+
+
 #   ----------------КОНЕЦ СОСТОЯНИЯ ОСНОВНОЙ---------------------
 #   ----------------НАЧАЛО СОСТОЯНИЯ СОСТАВ ПОРТФЕЛЯ--------------------
 # Команда /c — переключаемся в состояние для таблицы 4
@@ -1082,6 +1023,5 @@ async def management(message: types.Message):
         await message.answer("ОТЛИЧНАЯ ИДЕЯ!Спасибо ХОЗЯИН", reply_markup=inlinebtn.management_btn())
     except Exception as e:
         logi.err.info(f"management() в папке handlers/handler_message.py , Exception as e : {e}")
-
 
 #   ----------------КОНЕЦ ЗАПИСЬ ДЕЛА--------------------------
