@@ -313,9 +313,9 @@ async def process_m_trend_5min(message: Message, state: FSMContext):
         # узнаем сопутствующие товары
         data = await state.get_data()
         related_products_do = data.get("related_products")
-        related_products_posle = related_products_do.replace(",", " -       ,")
+        related_products_posle = related_products_do.replace(",", " -       ,\n ")
         # Добавляем " -       ." в самый конец строки
-        related_products_posle += " -       ."
+        related_products_posle += " -       .\n"
         await message.answer(f"{related_products_posle}")
         await message.answer(f"Введи <b>как ведут себя сопутствующие факторы?</b>", parse_mode="HTML",
                              reply_markup=inlinebtn.cancel_btn())
@@ -353,7 +353,8 @@ async def process_m_volume(message: Message, state: FSMContext):
         await message.answer(f"Объем: {volume}")
         # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_CUP)
-        await message.answer(f"Быки - преобладают, Медведи - преобладают. Быки стенка на -  ,  Медведи стенка на -   .")
+        await message.answer(
+            f"Быки - преобладают, Медведи - преобладают.\n Быки стенка на -  ,\n Медведи стенка на -   .\n ")
         await message.answer(f"Какой <b>стакан?</b>\nкто <b>преобладает?</b>\nкакие <b>стенки?</b>\n",
                              parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
@@ -374,7 +375,7 @@ async def process_m_cup(message: Message, state: FSMContext):
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_PATTERN)
         await message.answer(f"Не вижу паттернов")
-        await message.answer(f"Какие <b>паттерны</b>видишь?\n", parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
+        await message.answer(f"Какие <b>паттерны</b> видишь?\n", parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
         logi.err.info(f"process_m_cup() в папке handlers/handler_message.py ,Exception: {e}")
 
@@ -392,8 +393,7 @@ async def process_m_pattern(message: Message, state: FSMContext):
         await state.update_data(pattern=pattern)
         # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_CONCLUSION)
-        await message.answer(
-            f"Мой <b>расчет</b> на :   .\n<b>План</b> состоит из :    .\nМоя<b>Цель</b> :    .\nЯ <b>Опасаюсь</b> :    .\n")
+        await message.answer(f"Мой расчет на :   .\n План состоит из :    .\n Моя Цель :    .\n Я Опасаюсь :    .\n")
         await message.answer(f"Напиши <b>вывод</b>\nНужен только <b>смысл</b>\n", parse_mode="HTML",
                              reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
