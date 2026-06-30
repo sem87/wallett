@@ -1,7 +1,8 @@
 from typing import Any
 
-from pydantic import BaseModel, field_validator,field_serializer
+from pydantic import BaseModel, field_validator, field_serializer
 from datetime import datetime
+
 
 # from typing import Optional
 
@@ -127,8 +128,7 @@ class Molnia(BaseModel):
     conclusion: str
     final_conclusion: str
 
-
-    @field_validator("news", "attendant", "volume", "cup", "conclusion", mode="before")
+    @field_validator("news", "attendant", "volume", "cup", "pattern", "conclusion", mode="before")
     @classmethod
     def normalize_conclusion(cls, v: Any) -> str:
         """Нормализует вывод/заключение"""

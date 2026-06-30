@@ -95,9 +95,10 @@ def input_btn_up_down_hour():
 
 def input_btn_up_down_5min():
     keyboard_builder = InlineKeyboardBuilder()
-    keyboard_builder.button(text="вверх", callback_data="up_5min")
-    keyboard_builder.button(text="вниз", callback_data="down_5min")
-    keyboard_builder.adjust(2)
+    keyboard_builder.button(text=" вверх ", callback_data="up_5min")
+    keyboard_builder.button(text=" вниз ", callback_data="down_5min")
+    keyboard_builder.button(text=" дно/max ", callback_data="dno_max")
+    keyboard_builder.adjust(3)
     return keyboard_builder.as_markup()
 
 def input_btn_volume():

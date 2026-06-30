@@ -15,7 +15,7 @@ class UserData(StatesGroup):
     TABLE_1_ATTENDANT = State()  # Шаг 6: Ожидание сопутствующие
     TABLE_1_VOLUME = State()  # Шаг 7: Ожидание объем
     TABLE_1_CUP = State()  # Шаг 8: Ожидание стакан
-    #TABLE_1_PATTERN = State()  # Шаг 9: Ожидание паттерна
+    TABLE_1_PATTERN = State()  # Шаг 9: Ожидание паттерна
     TABLE_1_CONCLUSION = State()  # Шаг 10: Ожидание вывода/заключения
     TABLE_1_QUANTITY = State()    # Шаг 11: Ожидание количества
     TABLE_1_PRICE = State()       # Шаг 12: Ожидание цены

@@ -206,15 +206,17 @@ async def process_m_ticker(message: Message, state: FSMContext):
         await state.update_data(tiker=tiker)
         if tiker in dict_ticker_number:
             num_str = dict_ticker_number[tiker]
-            total_capital = Read(Nazvanie_operazii="", range=f"analystrade!AB{num_str}")[0]
+            # total_capital = Read(Nazvanie_operazii="", range=f"analystrade!AB{num_str}")[0]
             related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{num_str}")[0]
             operating_principle = Read(Nazvanie_operazii="", range=f"analystrade!AJ{num_str}")[0]
-            level_price = Read(Nazvanie_operazii="", range=f"analystrade!AK{num_str}")[0]
+            # level_price = Read(Nazvanie_operazii="", range=f"analystrade!AK{num_str}")[0]
         else:
-            total_capital = "нету"
+            # total_capital = "нету"
             related_products = "нету"
             operating_principle = "нету"
-            level_price = "нету"
+            # level_price = "нету"
+        # Запомним в память (словарь) сопутствующие товары
+        await state.update_data(related_products=related_products)
         text_data = (
             f"📊 <b>Данные по тикеру {tiker}:</b>\n\n"
             f"🔗 <b>Влияет:</b> {related_products}\n"
@@ -306,8 +308,15 @@ async def process_m_trend_5min(message: Message, state: FSMContext):
         # Достаём конкретное значение
         direction_5min = data.get("trend_5min")
         await message.answer(f"Трэнд 5мин: {direction_5min}")
-        # # Переходим к следующему шагу
+        # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_ATTENDANT)
+        # узнаем сопутствующие товары
+        data = await state.get_data()
+        related_products_do = data.get("related_products")
+        related_products_posle = related_products_do.replace(",", " -       ,")
+        # Добавляем " -       ." в самый конец строки
+        related_products_posle += " -       ."
+        await message.answer(f"{related_products_posle}")
         await message.answer(f"Введи <b>как ведут себя сопутствующие факторы?</b>", parse_mode="HTML",
                              reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
@@ -342,8 +351,9 @@ async def process_m_volume(message: Message, state: FSMContext):
         # Достаём конкретное значение
         volume = data.get("volume")
         await message.answer(f"Объем: {volume}")
-        # # Переходим к следующему шагу
+        # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_CUP)
+        await message.answer(f"Быки - преобладают, Медведи - преобладают. Быки стенка на -  ,  Медведи стенка на -   .")
         await message.answer(f"Какой <b>стакан?</b>\nкто <b>преобладает?</b>\nкакие <b>стенки?</b>\n",
                              parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
@@ -362,7 +372,28 @@ async def process_m_cup(message: Message, state: FSMContext):
         # Запоминаем вывод в "память" состояния
         await state.update_data(cup=cup)
         # # Переходим к следующему шагу
+        await state.set_state(UserData.TABLE_1_PATTERN)
+        await message.answer(f"Не вижу паттернов")
+        await message.answer(f"Какие <b>паттерны</b>видишь?\n", parse_mode="HTML", reply_markup=inlinebtn.cancel_btn())
+    except Exception as e:
+        logi.err.info(f"process_m_cup() в папке handlers/handler_message.py ,Exception: {e}")
+
+
+@handler_message_router.message(UserData.TABLE_1_PATTERN)
+async def process_m_pattern(message: Message, state: FSMContext):
+    """Получаем паттерны"""
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            await state.clear()
+            return
+        pattern = message.text.strip().lower()
+        # Запоминаем вывод в "память" состояния
+        await state.update_data(pattern=pattern)
+        # # Переходим к следующему шагу
         await state.set_state(UserData.TABLE_1_CONCLUSION)
+        await message.answer(
+            f"Мой <b>расчет</b> на :   .\n<b>План</b> состоит из :    .\nМоя<b>Цель</b> :    .\nЯ <b>Опасаюсь</b> :    .\n")
         await message.answer(f"Напиши <b>вывод</b>\nНужен только <b>смысл</b>\n", parse_mode="HTML",
                              reply_markup=inlinebtn.cancel_btn())
     except Exception as e:
@@ -447,9 +478,9 @@ async def process_m_price(message: Message, state: FSMContext):
         attendant = data.get("attendant")
         volume = data.get("volume")
         cup = data.get("cup")
-        pattern = "паттерны"
+        pattern = data.get("pattern")
         conclusion = data.get("conclusion")
-        final_conclusion = "итог"
+        final_conclusion = "Итоговая оценка сделки :    . Плану соответствовало :    . Ошибки и минусы сделки :   ."
         # Создаем модель
         m_basic = pydantic_models.Molnia(tiker=tiker, check=check, btn_buy_sell=btn_buy_sell,
                                          quantity_int=quantity_int, price_float=price_float, stop_market=stop_market,
