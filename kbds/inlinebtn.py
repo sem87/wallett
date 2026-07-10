@@ -16,7 +16,7 @@ def terminator_variety():
 def lightning():
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(text="итого месяц", callback_data="result_month")
-    keyboard_builder.button(text="параметры МО", callback_data="win_rate")
+    keyboard_builder.button(text="парам МатОж", callback_data="win_rate")
     keyboard_builder.button(text="параметры просадки", callback_data="prosadka_parametr")
     keyboard_builder.adjust(2, 1)
     return keyboard_builder.as_markup()

@@ -464,22 +464,21 @@ async def process_m_price(message: Message, state: FSMContext):
         check = "молния"
         btn_buy_sell = data.get("btn_buy_sell")
         date_str = datetime.now().strftime("%Y-%m-%d")
-        quantity_int = data.get("quantity_int")
-        price_float = data.get("price_float")
+        quantity_int = int(data.get("quantity_int"))
+        price_float = float(data.get("price_float"))
         # выяснить может быть делать после пайдентик
-
-
 
         # Прежде чем показывать расчеты нужно показать справочное сообщение
         # Нужно читать данные из гугл таблице   R:R риск келли и в зависимости от покупка или продажа нужно считать стоп
         # прочитаем из гугла
-        pecent_risk = float(Read(Nazvanie_operazii="", range=f"молния!AF2")[0])
-        R_R = float(Read(Nazvanie_operazii="", range=f"молния!AC2")[0])
+        pecent_risk = abs((float(Read(Nazvanie_operazii="", range=f"молния!AF2")[0])) / 100)
+        R_R = abs(float(Read(Nazvanie_operazii="", range=f"молния!AC2")[0]))
+        # print(f"&&&&&&&&&&&&&&&&&&&&&{pecent_risk}$$$$$$$$$$$$$${R_R}")
         # тогда расчет стопов на покупку
-        if btn_buy_sell=="покупка":
-            stop_market = round(price_float * (1-pecent_risk), 2)
+        if btn_buy_sell == "покупка":
+            stop_market = round(price_float * (1 - pecent_risk), 2)
             stop_market_0 = round(price_float * 1.001, 2)
-            take_profit = round(price_float *(1+pecent_risk*R_R), 2)
+            take_profit = round(price_float * (1 + pecent_risk * R_R), 2)
         # тогда расчет стопов на продажу
         elif btn_buy_sell == "продажа":
             # Стоп-лосс: цена идет ВВЕРХ (против нас), поэтому прибавляем риск
@@ -489,12 +488,7 @@ async def process_m_price(message: Message, state: FSMContext):
             # Тейк-профит: цена идет ВНИЗ (в нашу сторону), поэтому вычитаем риск * R_R
             take_profit = round(price_float * (1 - pecent_risk * R_R), 2)
         # выяснить может быть делать после пайдентик
-
-
-
-
-
-
+        # print(f"{stop_market}$$$$$$${stop_market_0}$$$$$$$$${take_profit}")
 
         news = data.get("news")
         trend_day = data.get("trend_day")
@@ -542,8 +536,8 @@ async def process_m_price(message: Message, state: FSMContext):
             f"✅ <b>Данные сохранены</b>\n"
             f"<b>молния</b>\n\n"
             f"↔️ <b>Безубыточность:</b> {m_basic.stop_market_0}\n"
-            f"🛑 <b>Стоп маркет -0,6%:</b> {m_basic.stop_market}\n"
-            f"✅ <b>Тейк-профит 3%:</b> {m_basic.take_profit}\n\n")
+            f"🛑 <b>Стоп маркет :</b> {m_basic.stop_market}\n"
+            f"✅ <b>Тейк-профит :</b> {m_basic.take_profit}\n\n")
         await message.answer(response_text, parse_mode="HTML")
         # Полностью очищаем состояние в самом конце
         await state.clear()
