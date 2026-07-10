@@ -481,11 +481,13 @@ async def process_m_price(message: Message, state: FSMContext):
             stop_market_0 = round(price_float * 1.001, 2)
             take_profit = round(price_float *(1+pecent_risk*R_R), 2)
         # тогда расчет стопов на продажу
-        if btn_buy_sell == "продажа":
-            stop_market = round(price_float * (1 - pecent_risk), 2)
-            stop_market_0 = round(price_float * 1.001, 2)
-            take_profit = round(price_float * (1 + pecent_risk * R_R), 2)
-
+        elif btn_buy_sell == "продажа":
+            # Стоп-лосс: цена идет ВВЕРХ (против нас), поэтому прибавляем риск
+            stop_market = round(price_float * (1 + pecent_risk), 2)
+            # Начальный стоп/триггер: цена идет ВНИЗ (в нашу сторону), поэтому убавляем
+            stop_market_0 = round(price_float * 0.999, 2)
+            # Тейк-профит: цена идет ВНИЗ (в нашу сторону), поэтому вычитаем риск * R_R
+            take_profit = round(price_float * (1 - pecent_risk * R_R), 2)
         # выяснить может быть делать после пайдентик
 
 
