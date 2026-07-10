@@ -52,7 +52,7 @@ async def process_result_month(callback: CallbackQuery):
 
 @callback_router.callback_query(F.data == "win_rate")
 async def process_result_win_rate(callback: CallbackQuery):
-    """win_rate"""
+    """ПАРАМЕТРЫ МАТ ОЖИДАНИЯ"""
     try:
         if not is_admin(callback.from_user.id):
             await callback.message.delete()
@@ -60,27 +60,60 @@ async def process_result_win_rate(callback: CallbackQuery):
         # Правильное подтверждение нажатия кнопки
         await callback.answer("Загружаю win_rate...", show_alert=False)
         # Отправка сообщения через callback.bot
-        win_rate_sum = Read(Nazvanie_operazii="", range="молния!Q2")[0]
-        calculated_risk = Read(Nazvanie_operazii="", range="молния!P2")[0]
-        await callback.message.answer(f"win_rate за все время : {win_rate_sum}")
-        await callback.message.answer(f"расчетный риск : {calculated_risk}")
+        date_analiza_s = Read(Nazvanie_operazii="", range="молния!AG2")[0]
+        fact_percent_kelli = Read(Nazvanie_operazii="", range="молния!AF2")[0]
+        profit_factor = Read(Nazvanie_operazii="", range="молния!AJ2")[0]
+        win_rate = Read(Nazvanie_operazii="", range="молния!AI2")[0]
+        kelli = Read(Nazvanie_operazii="", range="молния!AH2")[0]
+        match_ozidanie = Read(Nazvanie_operazii="", range="молния!AE2")[0]
+        r_r = Read(Nazvanie_operazii="", range="молния!AC2")[0]
+        # calculated_risk = Read(Nazvanie_operazii="", range="молния!P2")[0]
+
+        text_data_parametr = (
+            f"<b>📊 Статистика торговли c </b>{date_analiza_s} \n"
+            f"<b>Фактический Келли</b> {fact_percent_kelli} \n\n"
+            f"💰 <b>Profit Factor</b> (во сколько прибыли больше убытков)\n"
+            f"<code>{profit_factor}</code>\n\n"
+            f"🎯 <b>Win Rate</b> (% прибыльных сделок из всех)\n"
+            f"<code>{win_rate}%</code>\n\n"
+            f"🎲 <b>Келли</b> (на какой % нужно рисковать 1/2)\n"
+            f"<code>{kelli}%</code>\n\n"
+            f"📈 <b>Мат. ожидание</b> (средний заработок за сделку)\n"
+            f"<code>{match_ozidanie} ₽</code>\n\n"
+            f"⚖️ <b>R:R</b> (сколько руб. прибыли на 1 руб. риска)\n"
+            f"<code>{r_r}</code>\n\n"
+        )
+
+        await callback.message.answer(text_data_parametr, parse_mode="HTML")
     except Exception as e:
         logi.err.info(f"process_result_win_rate() в папке handlers/callbackdata , Exception as e : {e}")
 
 
-@callback_router.callback_query(F.data == "rez2")
-async def process_result_rez2(callback: CallbackQuery):
+@callback_router.callback_query(F.data == "prosadka_parametr")
+async def process_result_prosadka_parametr(callback: CallbackQuery):
     """rez2"""
     try:
         if not is_admin(callback.from_user.id):
             await callback.message.delete()
             return
         # ✅ Правильное подтверждение нажатия кнопки
-        await callback.answer("Загружаю данные за rez2...", show_alert=False)
-        # ✅ Отправка сообщения через callback.bot
-        await callback.message.answer("🔵🔵🔵")
+        await callback.answer("Загружаю данные параметры просадки...", show_alert=False)
+        # ✅ Отправка сообщения
+        srednaa_shistaa_pribil = Read(Nazvanie_operazii="", range="молния!AA2")[0]
+        srednaa_shistaa_ybitok = Read(Nazvanie_operazii="", range="молния!AB2")[0]
+        max_seria_ybitkov = Read(Nazvanie_operazii="", range="молния!Z2")[0]
+        mozno_poterat_ot_depozita = Read(Nazvanie_operazii="", range="молния!Y2")[0]
+        text_data_parametr_prosadka = (
+            f"<b>📉 Анализ просадок</b>\n\n"
+            f"💵 <b>Средняя чистая прибыль:</b> <code>{srednaa_shistaa_pribil}</code>\n"
+            f"📊 <b>Средний чистый убыток:</b> <code>{srednaa_shistaa_ybitok}</code>\n"
+            f"🔻 <b>max серия убытков:</b> <code>{max_seria_ybitkov}</code>\n"
+            f"⚠️ <b>можно потерять от депозита:</b> <code>{mozno_poterat_ot_depozita}%</code>\n\n"
+        )
+
+        await callback.message.answer(text_data_parametr_prosadka, parse_mode="HTML")
     except Exception as e:
-        logi.err.info(f"process_result_rez2() в папке handlers/callbackdata , Exception as e : {e}")
+        logi.err.info(f"process_result_prosadka_parametr() в папке handlers/callbackdata , Exception as e : {e}")
 
 
 # ---------------------КОНЕЦ КНОПОК ДЛЯ молнии---------------

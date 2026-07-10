@@ -467,10 +467,33 @@ async def process_m_price(message: Message, state: FSMContext):
         quantity_int = data.get("quantity_int")
         price_float = data.get("price_float")
         # выяснить может быть делать после пайдентик
-        stop_market = round(price_float * 0.994, 2)
-        stop_market_0 = round(price_float * 1.001, 2)
-        take_profit = round(price_float * 1.03, 2)
+
+
+
+        # Прежде чем показывать расчеты нужно показать справочное сообщение
+        # Нужно читать данные из гугл таблице   R:R риск келли и в зависимости от покупка или продажа нужно считать стоп
+        # прочитаем из гугла
+        pecent_risk = float(Read(Nazvanie_operazii="", range=f"молния!AF2")[0])
+        R_R = float(Read(Nazvanie_operazii="", range=f"молния!AC2")[0])
+        # тогда расчет стопов на покупку
+        if btn_buy_sell=="покупка":
+            stop_market = round(price_float * (1-pecent_risk), 2)
+            stop_market_0 = round(price_float * 1.001, 2)
+            take_profit = round(price_float *(1+pecent_risk*R_R), 2)
+        # тогда расчет стопов на продажу
+        if btn_buy_sell == "продажа":
+            stop_market = round(price_float * (1 - pecent_risk), 2)
+            stop_market_0 = round(price_float * 1.001, 2)
+            take_profit = round(price_float * (1 + pecent_risk * R_R), 2)
+
         # выяснить может быть делать после пайдентик
+
+
+
+
+
+
+
         news = data.get("news")
         trend_day = data.get("trend_day")
         trend_hour = data.get("trend_hour")
@@ -655,10 +678,10 @@ async def process_price(message: Message, state: FSMContext):
         now = datetime.now()
         date_str = now.strftime("%Y-%m-%d")
 
-        # Ваши расчеты
         stop_market_basic = round(d_basic.price * 0.994, 2)
         stop_market_0_basic = round(d_basic.price * 1.001, 2)
         take_profit_basic = round(d_basic.price * 1.03, 2)
+
         vivod_itog = "zzz"
         if d_basic.tiker in dict_ticker_number:
             i = dict_ticker_number[d_basic.tiker]
