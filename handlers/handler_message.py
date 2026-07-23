@@ -1062,7 +1062,7 @@ async def management(message: types.Message):
             [
                 "zzz",
                 date_str,
-                "zzz",
+                66,
                 "zzz",
                 text.text,
                 intelligence.text,
@@ -1070,6 +1070,8 @@ async def management(message: types.Message):
                 "С+А",
                 "zzz",
                 "zzz",
+                "0%",
+                "zzz"
             ]
         ]
         Dobavlenie_vstavka_strok(
