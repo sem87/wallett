@@ -6,6 +6,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import re
 
 # import pyautogui
 # import base64
@@ -138,7 +139,7 @@ class GoogleSheet:
     def appendRangeValues_vstavka_strok(self, range, values):
         """КЛАСС ДОБАВЛЯЕТ ЗНАЧЕНИЕ ЯЧЕЕК ОДНОВРЕМЕННО СО ВСТАВКОЙ СТРОК"""
         body = {"values": values}
-        self.service.spreadsheets().values().append(
+        response = self.service.spreadsheets().values().append(
             spreadsheetId=self.SPREADSHEET_ID,
             # ID самой книги гугл таблици
             range=range,
@@ -164,9 +165,10 @@ class GoogleSheet:
         ).execute()
         # values() используется со словарями и возвращает представление всех значений в словаре
         # execute() передает до гугл таблиц это завершение процесса
+        # Возвращаем ответ API (там содержится информация о том, куда именно вставилось)
+        return response
 
-        """___________________КОНЕЦ_______________________"""
-
+    """___________________КОНЕЦ_______________________"""
     """ФУНКЦИИ ЧТЕНИЯ ЯЧЕЕК"""
 
     def ReadTable(self, range):
@@ -261,6 +263,19 @@ class GoogleSheet:
             body=body
         ).execute()
 
+    def get_next_empty_row(self, sheet_name):
+        """Возвращает номер первой пустой строки на листе"""
+        # Считываем весь столбец A, чтобы найти последнюю заполненную строку
+        result = self.service.spreadsheets().values().get(
+            spreadsheetId=self.SPREADSHEET_ID,
+            range=f"{sheet_name}!A:A"
+        ).execute()
+
+        values = result.get('values', [])
+        # Если таблица полностью пустая, начинаем с 1-й строки.
+        # Иначе длина массива + 1 (можно изменить на +2, если есть шапка)
+        return len(values) + 1 if len(values) > 0 else 1
+
 
 """___________________КОНЕЦ_______________________"""
 
@@ -284,11 +299,52 @@ def Dobavlenie(Nazvanie_operazii, diapozon_dannich, znachenie):
     GoogleSheet().appendRangeValues(range=diapozon_dannich, values=znachenie)
 
 
+# def Dobavlenie_vstavka_strok(Nazvanie_operazii, diapozon_dannich, znachenie):
+#     """ДОБАВЛЕНИЕ ЗАДАННЫХ ЯЧЕЕК СО ВСТАВКОЙ СТРОК"""
+#     GoogleSheet().appendRangeValues_vstavka_strok(
+#         range=diapozon_dannich, values=znachenie
+#     )
+
+
 def Dobavlenie_vstavka_strok(Nazvanie_operazii, diapozon_dannich, znachenie):
-    """ДОБАВЛЕНИЕ ЗАДАННЫХ ЯЧЕЕК СО ВСТАВКОЙ СТРОК"""
-    GoogleSheet().appendRangeValues_vstavka_strok(
-        range=diapozon_dannich, values=znachenie
+    """ДОБАВЛЕНИЕ ЗАДАННЫХ ЯЧЕЕК СО ВСТАВКОЙ СТРОК С ДИНАМИЧЕСКОЙ ФОРМУЛОЙ"""
+
+    # 1. Извлекаем имя листа из диапазона (например, из "Дела и управление!A5" получаем "Дела и управление")
+    sheet_name = diapozon_dannich.split('!')[0]
+
+    # 2. Узнаем номер первой пустой строки
+    gs = GoogleSheet()
+    target_row = gs.get_next_empty_row(sheet_name)
+
+    # 3. Проходимся по всем строкам, которые мы хотим вставить (обычно это 1 строка, но делаем универсально)
+    for i, row_data in enumerate(znachenie):
+        current_row = target_row + i
+
+        # Проверяем, есть ли у нас маркер для формулы в 4-м столбце (индекс 3, это столбец D)
+        # Замените "FORMULA_HERE" на то, что вы решите использовать как маркер,
+        # или просто формируйте формулу сразу при создании action_plan (см. ниже)
+        if len(row_data) > 3 and isinstance(row_data[3], str) and "FORMULA" in row_data[3]:
+            # Формируем формулу: =$B{номер_строки}+C{номер_строки}-1
+            # Знак $ перед B фиксирует столбец B при копировании, C остается относительным
+            row_data[3] = f"=$B{current_row}+C{current_row}-1"
+            # --- ОБРАБОТКА СТОЛБЦА L (Индекс 11) ---
+
+        if len(row_data) > 11 and row_data[11] == "SPARK":
+            # ВАЖНО: {{ и }} используются, чтобы Python не пытался прочитать их как переменные f-строки.
+            # Они превратятся в одиночные { и } при отправке в Google Таблицу.
+            row_data[11] = f'=ЕСЛИОШИБКА(SPARKLINE(K{current_row},{{"charttype","bar";"color1","black";"max",1}}))'
+
+            # ПРИМЕЧАНИЕ: Если ваша Google Таблица использует запятые вместо точек с запятой
+            # в качестве разделителя аргументов, замените все ; на , внутри фигурных скобок выше.
+
+        # 4.
+
+    # 4. Отправляем обновленные данные в таблицу
+    response = gs.appendRangeValues_vstavka_strok(
+        range=diapozon_dannich,
+        values=znachenie
     )
+    return response  # Можно вернуть для логирования
 
 
 def Read(Nazvanie_operazii, range):

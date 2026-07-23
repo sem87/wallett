@@ -6,6 +6,7 @@ from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
+import googleteable
 from googleteable import MONTH_TO_COLUMN, Delete_row, Dobavlenie, Dobavlenie_vstavka_strok, Izmenenie, Read
 from iiqwen import client, intelligence_def
 from kbds import inlinebtn  # убедитесь, что путь верный почему то ошибка в IDE
@@ -1063,7 +1064,7 @@ async def management(message: types.Message):
                 False,
                 date_str,
                 66,
-                "zzz",
+                "FORMULA",
                 text.text,
                 intelligence.text,
                 "zzz",
@@ -1071,7 +1072,7 @@ async def management(message: types.Message):
                 "zzz",
                 "zzz",
                 "0%",
-                "zzz"
+                "SPARK"
             ]
         ]
         Dobavlenie_vstavka_strok(
