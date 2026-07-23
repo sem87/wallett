@@ -1006,31 +1006,39 @@ async def do_list(message: types.Message):
             await message.delete()
             return
         await message.answer("Рандомно дела ...⏳")
-        everything_to_do = Read(Nazvanie_operazii="", range="Дела и управление!J2")[0]
-        await message.answer(f"⚙️Всего дел : {everything_to_do}\n")
+        everything_to_do = Read(Nazvanie_operazii="", range="Дела и управление!L2")[0]
+        everything_skolko_sdelano = Read(Nazvanie_operazii="", range="Дела и управление!K3")[0]
+        # await message.answer(f"Всего дел : {everything_to_do}\n")
+        await message.answer(f"{everything_skolko_sdelano}")
         random_string = str(random.randint(1, int(everything_to_do)) + 3)
         # Читаем рандомно дела
         dead_line = Read(Nazvanie_operazii="", range=f"Дела и управление!D{random_string}")[0]
         tasks = Read(Nazvanie_operazii="", range=f"Дела и управление!E{random_string}")[0]
-        artificial_intelligence = Read(Nazvanie_operazii="", range=f"Дела и управление!F{random_string}")[0]
-        other_information = Read(Nazvanie_operazii="", range=f"Дела и управление!G{random_string}:I{random_string}")
-        await message.answer(f"⚙️ДЕЛА РАНДОМНО⚙️\n\nСтрока {random_string}\n\n{other_information}")
-        await message.answer(f"{tasks}\n")
-        await message.answer(f"{artificial_intelligence}\n")
-        dead_line_datetime = datetime.strptime(dead_line, "%Y-%m-%d")
-        now = datetime.now()
-        if dead_line_datetime > now:
-            await message.answer(
-                f"❗Дед-лайн {dead_line_datetime.date()}❗\n"
-                f"В запасе  {(dead_line_datetime - now).days} дней\n"
-                f"🕰️Время есть еще...\n"
-            )
+        # artificial_intelligence = Read(Nazvanie_operazii="", range=f"Дела и управление!F{random_string}")[0]
+        kategoria = Read(Nazvanie_operazii="", range=f"Дела и управление!G{random_string}")[0]
+        prozent_vipolnenia = Read(Nazvanie_operazii="", range=f"Дела и управление!K{random_string}")[0]
+        if prozent_vipolnenia=="100%":
+            await message.answer(f"ЗАДАНИЕ ВЫПОЛНЕНО !!!")
+            await message.answer(f"{tasks}\n")
+            await message.answer(f"МОЛОДЕЦ !!!")
         else:
-            await message.answer(
-                f"❗Дед-лайн {dead_line_datetime.date()}❗\n"
-                f"🩸🩸🩸ПРОСРОЧЕНО на {(dead_line_datetime - now).days} дней\n"
-                f"🩸Быстрее нужно делать\n"
-            )
+            await message.answer(f"⚙️ДЕЛА РАНДОМНО⚙️\nСтрока {random_string}\n{kategoria}\nПроцент выполненого {prozent_vipolnenia}")
+            await message.answer(f"{tasks}\n")
+            # await message.answer(f"{artificial_intelligence}\n")
+            dead_line_datetime = datetime.strptime(dead_line, "%Y-%m-%d")
+            now = datetime.now()
+            if dead_line_datetime > now:
+                await message.answer(
+                    f"Дед-лайн {dead_line_datetime.date()}\n"
+                    f"В запасе  {(dead_line_datetime - now).days} дней\n"
+                    f"🕰️Время есть еще...\n"
+                )
+            else:
+                await message.answer(
+                    f"❗Дед-лайн {dead_line_datetime.date()}❗\n"
+                    f"🩸🩸🩸ПРОСРОЧЕНО на {(dead_line_datetime - now).days} дней\n"
+                    f"🩸Быстрее нужно делать\n"
+                )
     except Exception as e:
         logi.err.info(f"do_list() в папке handlers/handler_message.py , Exception as e : {e}")
 
