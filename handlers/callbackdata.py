@@ -160,10 +160,30 @@ async def process_result_win_rate_basic(callback: CallbackQuery):
         # Правильное подтверждение нажатия кнопки
         await callback.answer("Загружаю win_rate...", show_alert=False)
         # Отправка сообщения через callback.bot
-        win_rate_sum = Read(Nazvanie_operazii="", range="основной!Q2")[0]
-        calculated_risk = Read(Nazvanie_operazii="", range="основной!P2")[0]
-        await callback.message.answer(f"win_rate за все время : {win_rate_sum}")
-        await callback.message.answer(f"расчетный риск : {calculated_risk}")
+        date_analiza_osnovnoi = Read(Nazvanie_operazii="", range="основной!Z2")[0]
+        fact_percent_kelli_osnovnoi = Read(Nazvanie_operazii="", range="основной!Y2")[0]
+        profit_factor_osnovnoi = Read(Nazvanie_operazii="", range="основной!AC2")[0]
+        win_rate_osnovnoi = Read(Nazvanie_operazii="", range="основной!AB2")[0]
+        kelli_osnovnoi = Read(Nazvanie_operazii="", range="основной!AA2")[0]
+        match_ozidanie_osnovnoi = Read(Nazvanie_operazii="", range="основной!X2")[0]
+        r_r_osnovnoi = Read(Nazvanie_operazii="", range="основной!V2")[0]
+
+        text_data_parametr_osnovnoi = (
+            f"<b>===ОСНОВНОЙ===</b>\n"
+            f"<b>📊 Статистика торговли c </b>{date_analiza_osnovnoi} \n"
+            f"<b>Фактический Келли</b> {fact_percent_kelli_osnovnoi} \n\n"
+            f"💰 <b>Profit Factor</b> (во сколько прибыли больше убытков)\n"
+            f"<code>{profit_factor_osnovnoi}</code>\n\n"
+            f"🎯 <b>Win Rate</b> (% прибыльных сделок из всех)\n"
+            f"<code>{win_rate_osnovnoi}%</code>\n\n"
+            f"🎲 <b>Келли</b> (на какой % нужно рисковать 1/2)\n"
+            f"<code>{kelli_osnovnoi}%</code>\n\n"
+            f"📈 <b>Мат. ожидание</b> (средний заработок за сделку)\n"
+            f"<code>{match_ozidanie_osnovnoi} ₽</code>\n\n"
+            f"⚖️ <b>R:R</b> (сколько руб. прибыли на 1 руб. риска)\n"
+            f"<code>{r_r_osnovnoi}</code>\n\n"
+        )
+        await callback.message.answer(text_data_parametr_osnovnoi, parse_mode="HTML")
     except Exception as e:
         logi.err.info(f"process_result_win_rate_basic() в папке handlers/callbackdata , Exception as e : {e}")
 
