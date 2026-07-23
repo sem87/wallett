@@ -1060,7 +1060,7 @@ async def management(message: types.Message):
         await message.answer(intelligence.text)
         action_plan = [
             [
-                "zzz",
+                False,
                 date_str,
                 66,
                 "zzz",
