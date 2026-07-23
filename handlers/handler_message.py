@@ -14,7 +14,7 @@ from logi import logi
 from pydant import pydantic_models
 from states import UserData  # ← Чистый и понятный импорт
 from utils import is_admin
-
+import time
 # from databazesql import databaze_sql_term
 
 handler_message_router = Router()
@@ -169,9 +169,10 @@ async def compound_btn(message: types.Message):
                     ticker_compound = Read(Nazvanie_operazii="", range=f"analystrade!Z{i}")[0]
                     action_compound = Read(Nazvanie_operazii="", range=f"analystrade!AA{i}")[0]
                     sum_compound = Read(Nazvanie_operazii="", range=f"analystrade!AB{i}")[0]
+                    time.sleep(2)
                 except Exception as e:
                     logi.err.info(
-                        f"compound_btn_btn() ошибка состав портф handlers/handler_message, Exception as e : {e}"
+                        f"compound_btn_btn() ошибка состав портф compound_btn() handlers/handler_message, Exception as e : {e}"
                     )
                 await message.answer(f"{i}){ticker_compound}: 💵{sum_compound}p == {action_compound}\n")
     except Exception as e:
@@ -719,7 +720,8 @@ async def cmd_c(message: Message, state: FSMContext):
             return
         await message.answer("работа с таблицей 💼состав💼")
         await state.set_state(UserData.TABLE_4)  # Запоминаем контекст
-        await message.answer("✏️ Введите данные для 💼состав💼: строка ; действие", parse_mode="HTML")
+        await message.answer("Можно скопировать старый состав портфеля и делать изменения", parse_mode="HTML")
+        await message.answer("✏️ Введите данные для 💼состав💼: тикер; действие", parse_mode="HTML")
     except Exception as e:
         logi.err.info(f"cmd_o() в папке handlers/handler_message.py , Exception as e : {e}")
 
@@ -737,15 +739,21 @@ async def handle_table4_data_basic(message: Message, state: FSMContext):
         if len(parts) != 2:
             await message.answer("Неверный формат!")
             return
-        line, action = parts
-        compound_pydent = pydantic_models.Сompound(line=line, action=action)
-        compound_pydent_str = [[compound_pydent.action]]
-        Izmenenie(
-            Nazvanie_operazii="",
-            diapozon_dannich=f"analystrade!AA{compound_pydent.line}",
-            znachenie=compound_pydent_str,
-        )
-        await message.answer("Данные сохранены в 💼состав💼 в действие")
+        line_ticker, action = parts
+        # Нужно прогнать тикер через пайдентик
+        tiker = line_ticker.strip().upper()
+        if tiker in dict_ticker_number:
+            num_str = dict_ticker_number[tiker]
+            compound_pydent = pydantic_models.Сompound(line=num_str, action=action)
+            compound_pydent_str = [[compound_pydent.action]]
+            Izmenenie(
+                Nazvanie_operazii="",
+                diapozon_dannich=f"analystrade!AA{compound_pydent.line}",
+                znachenie=compound_pydent_str,
+            )
+            await message.answer("Данные сохранены в 💼состав💼 в действие")
+        else:
+            await message.answer("Нет такого тикера")
         await state.clear()  # Выходим из состояния
     except Exception as e:
         logi.err.info(f"handle_table4_data_basic() в папке handlers/handler_message.py , Exception as e : {e}")
