@@ -720,7 +720,8 @@ async def process_price(message: Message, state: FSMContext):
              "O_ITOGO_2", "O_ITOGO_3", "O_ITOGO_ZARABOTOK", "O_PREDBEZUBITOK", "O_DNEI", "O_PROZENT", date_str,
              "O_REZULTAT", "O_VLOZENII_RUBL", "O_KOMISSIA_POKUPKA", "O_KOMISSIA_PRODAZA"]]
 
-        Dobavlenie(Nazvanie_operazii="", diapozon_dannich="основной!A5", znachenie=plan_deistvi_basic)
+        # Dobavlenie(Nazvanie_operazii="", diapozon_dannich="основной!A5", znachenie=plan_deistvi_basic)
+        Dobavlenie_vstavka_strok(Nazvanie_operazii="", diapozon_dannich="основной!A5", znachenie=plan_deistvi_basic)
 
         # Отправка ответов пользователю
         response_text = (
