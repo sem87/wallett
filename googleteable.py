@@ -362,18 +362,63 @@ def Dobavlenie_vstavka_strok(Nazvanie_operazii, diapozon_dannich, znachenie):
                 f"(F{current_row}*E{current_row})*AF{current_row}*0,57)))))))))))"
             )
 
-            # --- ОБРАБОТКА СТОЛБЦА AA (Индекс 26) ---
-            if len(row_data) > 26 and isinstance(row_data[26], str) and "ITOGO_1" in row_data[26]:
-                # Формируем формулу с подстановкой номера текущей строки
-                row_data[26] = (f'=ЕСЛИ(C{current_row}="покупка",'f'ЕСЛИ(T{current_row}="",0,'
-                                               f'(T{current_row}*U{current_row}-T{current_row}*U{current_row}*0.0005-'
-                                               f'ЕСЛИ(F{current_row}<T{current_row},(T{current_row}*U{current_row}-F{current_row}*U{current_row})*0.13,0)'
-                                               f'-(F{current_row}*U{current_row}+F{current_row}*U{current_row}*0.0005))),'
-                                               f'ЕСЛИ(T{current_row}="",0,'
-                                               f'((F{current_row}*U{current_row}-F{current_row}*U{current_row}*0.0005)'
-                                               f'-(T{current_row}*U{current_row}+T{current_row}*U{current_row}*0.0005)'
-                                               f'-ЕСЛИ(T{current_row}<F{current_row},(F{current_row}*U{current_row}-T{current_row}*U{current_row})*0.13,0))))'
-                                               )
+        # --- ОБРАБОТКА СТОЛБЦА AA (Индекс 26) ---
+        if len(row_data) > 26 and isinstance(row_data[26], str) and "ITOGO_1" in row_data[26]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[26] = (f'=ЕСЛИ(C{current_row}="покупка",'f'ЕСЛИ(T{current_row}="",0,'
+                            f'(T{current_row}*U{current_row}-T{current_row}*U{current_row}*0.0005-'
+                            f'ЕСЛИ(F{current_row}<T{current_row},(T{current_row}*U{current_row}-F{current_row}*U{current_row})*0.13,0)'
+                            f'-(F{current_row}*U{current_row}+F{current_row}*U{current_row}*0.0005))),'
+                            f'ЕСЛИ(T{current_row}="",0,'
+                            f'((F{current_row}*U{current_row}-F{current_row}*U{current_row}*0.0005)'
+                            f'-(T{current_row}*U{current_row}+T{current_row}*U{current_row}*0.0005)'
+                            f'-ЕСЛИ(T{current_row}<F{current_row},(F{current_row}*U{current_row}-T{current_row}*U{current_row})*0.13,0))))'
+                            )
+
+        # --- ОБРАБОТКА СТОЛБЦА AB (Индекс 27) ---
+        if len(row_data) > 27 and isinstance(row_data[27], str) and "ITOGO_2" in row_data[27]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[27] = (f'=ЕСЛИ(C{current_row}="покупка",'f'ЕСЛИ(V{current_row}="",0,'
+                            f'(V{current_row}*W{current_row}-V{current_row}*W{current_row}*0.0005-'
+                            f'ЕСЛИ(F{current_row}<V{current_row},(V{current_row}*W{current_row}-F{current_row}*W{current_row})*0.13,0)'
+                            f'-(F{current_row}*W{current_row}+F{current_row}*W{current_row}*0.0005))),'
+                            f'ЕСЛИ(V{current_row}="",0,'
+                            f'((F{current_row}*W{current_row}-F{current_row}*W{current_row}*0.0005)'
+                            f'-(V{current_row}*W{current_row}+V{current_row}*W{current_row}*0.0005)'
+                            f'-ЕСЛИ(V{current_row}<F{current_row},(F{current_row}*W{current_row}-V{current_row}*W{current_row})*0.13,0))))'
+                            )
+
+        # --- ОБРАБОТКА СТОЛБЦА AC (Индекс 28) ---
+        if len(row_data) > 28 and isinstance(row_data[28], str) and "ITOGO_3" in row_data[28]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[28] = (f'=ЕСЛИ(C{current_row}="покупка",'f'ЕСЛИ(X{current_row}="",0,'
+                            f'(X{current_row}*Y{current_row}-X{current_row}*Y{current_row}*0.0005-'
+                            f'ЕСЛИ(F{current_row}<X{current_row},(X{current_row}*Y{current_row}-F{current_row}*Y{current_row})*0.13,0)'
+                            f'-(F{current_row}*Y{current_row}+F{current_row}*Y{current_row}*0.0005))),'
+                            f'ЕСЛИ(X{current_row}="",0,'
+                            f'((F{current_row}*Y{current_row}-F{current_row}*Y{current_row}*0.0005)'
+                            f'-(X{current_row}*Y{current_row}+X{current_row}*Y{current_row}*0.0005)'
+                            f'-ЕСЛИ(X{current_row}<F{current_row},(F{current_row}*Y{current_row}-X{current_row}*Y{current_row})*0.13,0))))'
+                            )
+
+        # --- ОБРАБОТКА СТОЛБЦА AD (Индекс 29) ---
+        if len(row_data) > 29 and isinstance(row_data[29], str) and "ITOGO" in row_data[29]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[29] = (
+                f'=ЕСЛИ(E{current_row}<U{current_row}+W{current_row}+Y{current_row},"ошибка кол-ва",'f'(ЕСЛИ(T{current_row}="",0,AA{current_row})'
+                f'+ЕСЛИ(V{current_row}="",0,AB{current_row})'
+                f'+ЕСЛИ(X{current_row}="",0,AC{current_row})'
+                f'-Z{current_row}))'
+            )
+        # --- ОБРАБОТКА СТОЛБЦА AE (Индекс 30) ---
+        if len(row_data) > 30 and isinstance(row_data[30], str) and "PREDBEZYBITOK" in row_data[30]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[30] = (
+                f'=ЕСЛИОШИБКА(ЕСЛИ(AD{current_row}="ошибка кол-ва","ошибка кол-ва",'f'ЕСЛИ(C{current_row}="покупка",'
+                f'(F{current_row}*(U{current_row}+W{current_row}+Y{current_row})-AD{current_row})*1.00093/(U{current_row}+W{current_row}+Y{current_row}),'
+                f'(F{current_row}*(U{current_row}+W{current_row}+Y{current_row})+AD{current_row})*1.00093/(U{current_row}+W{current_row}+Y{current_row}))))'
+                )
+
     # 4. Отправляем обновленные данные в таблицу
     response = gs.appendRangeValues_vstavka_strok(
         range=diapozon_dannich,
