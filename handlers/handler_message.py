@@ -712,12 +712,16 @@ async def process_price(message: Message, state: FSMContext):
             related_products = Read(Nazvanie_operazii="", range=f"analystrade!AI{i}")[0]
         else:
             related_products = "нет такого тикера!"
+
         # Запись в Google Таблицы
         plan_deistvi_basic = [
             [d_basic.tiker, "основной", d_basic.action, date_str, d_basic.quantity, d_basic.price, d_basic.conclusion,
-             vivod_itog, related_products]
-        ]
+             vivod_itog, related_products, "", "", "", "", "", "", "", "", "", "O_BEZUBITOK_NACHALO", "O_ITOGO_1",
+             "O_ITOGO_2", "O_ITOGO_3", "O_ITOGO_ZARABOTOK", "O_PREDBEZUBITOK", "O_DNEI", "O_PROZENT", date_str,
+             "O_REZULTAT", "O_VLOZENII_RUBL", "O_KOMISSIA_POKUPKA", "O_KOMISSIA_PRODAZA"]]
+
         Dobavlenie(Nazvanie_operazii="", diapozon_dannich="основной!A5", znachenie=plan_deistvi_basic)
+
         # Отправка ответов пользователю
         response_text = (
             f"✅ <b>Данные сохранены</b>\n"
@@ -725,6 +729,7 @@ async def process_price(message: Message, state: FSMContext):
             f"↔️ <b>Безубыточность:</b> {stop_market_0_basic}\n"
             f"🛑 <b>Стоп маркет -0,6%:</b> {stop_market_basic}\n"
             f"✅ <b>Тейк-профит 3%:</b> {take_profit_basic}\n\n")
+
         await message.answer(response_text, parse_mode="HTML")
         # Полностью очищаем состояние в самом конце
         await state.clear()
