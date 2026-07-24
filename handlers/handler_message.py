@@ -510,6 +510,13 @@ async def process_m_price(message: Message, state: FSMContext):
                                          trend_5min=trend_5min,
                                          attendant=attendant, volume=volume, cup=cup, pattern=pattern,
                                          conclusion=conclusion, final_conclusion=final_conclusion)
+
+
+
+
+
+
+
         # Запись в Google Таблицы
         plan_deistvi_m_basic = [
             [m_basic.tiker,
@@ -530,9 +537,28 @@ async def process_m_price(message: Message, state: FSMContext):
              m_basic.cup,
              m_basic.pattern,
              m_basic.conclusion,
-             m_basic.final_conclusion]
+             m_basic.final_conclusion,
+             "",
+             "",
+             "",
+             "",
+             "",
+             "",
+             "COST_PLECHO",
+             "ITOGO_1"]
         ]
-        Dobavlenie(Nazvanie_operazii="", diapozon_dannich="молния!A5", znachenie=plan_deistvi_m_basic)
+
+
+
+
+
+        # Dobavlenie(Nazvanie_operazii="", diapozon_dannich="молния!A5", znachenie=plan_deistvi_m_basic)
+        Dobavlenie_vstavka_strok(Nazvanie_operazii="", diapozon_dannich="молния!A5", znachenie=plan_deistvi_m_basic)
+
+
+
+
+
         # Отправка ответов пользователю
         response_text = (
             f"✅ <b>Данные сохранены</b>\n"

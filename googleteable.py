@@ -327,8 +327,8 @@ def Dobavlenie_vstavka_strok(Nazvanie_operazii, diapozon_dannich, znachenie):
             # Формируем формулу: =$B{номер_строки}+C{номер_строки}-1
             # Знак $ перед B фиксирует столбец B при копировании, C остается относительным
             row_data[3] = f"=$B{current_row}+C{current_row}-1"
-            # --- ОБРАБОТКА СТОЛБЦА L (Индекс 11) ---
 
+            # --- ОБРАБОТКА СТОЛБЦА L (Индекс 11) ---
         if len(row_data) > 11 and row_data[11] == "SPARK":
             # ВАЖНО: {{ и }} используются, чтобы Python не пытался прочитать их как переменные f-строки.
             # Они превратятся в одиночные { и } при отправке в Google Таблицу.
@@ -337,8 +337,43 @@ def Dobavlenie_vstavka_strok(Nazvanie_operazii, diapozon_dannich, znachenie):
             # ПРИМЕЧАНИЕ: Если ваша Google Таблица использует запятые вместо точек с запятой
             # в качестве разделителя аргументов, замените все ; на , внутри фигурных скобок выше.
 
-        # 4.
+        # --- ОБРАБОТКА СТОЛБЦА Z (Индекс 25) ---
+        # if len(row_data) > 25 and isinstance(row_data[25], str) and "FOR" in row_data[25]:
+        #     # Формируем формулу: =$B{номер_строки}+C{номер_строки}-1
+        #     # Знак $ перед B фиксирует столбец B при копировании, C остается относительным
+        #     # row_data[25] = f"=$B{current_row}+C{current_row}-1"
+        #     row_data[25]=ЕСЛИ((F61*E61)*AF61<=5000,0,ЕСЛИ((F61*E61)*AF61<=50000,40,ЕСЛИ((F61*E61)*AF61<=100000,75,ЕСЛИ((F61*E61)*AF61<=250000,180,ЕСЛИ((F61*E61)*AF61<=500000,350,ЕСЛИ((F61*E61)*AF61<=1000000,700,ЕСЛИ((F61*E61)*AF61<=2500000,1750,ЕСЛИ((F61*E61)*AF61<=5000000,3500,ЕСЛИ((F61*E61)*AF61<=10000000,6900,ЕСЛИ((F61*E61)*AF61<=25000000,(F61*E61)*AF61*0,68,ЕСЛИ((F61*E61)*AF61<=50000000,(F61*E61)*AF61*0,65,(F61*E61)*AF61*0,57)))))))))))
 
+        # --- ОБРАБОТКА СТОЛБЦА Z (Индекс 25) ---
+        if len(row_data) > 25 and isinstance(row_data[25], str) and "COST_PLECHO" in row_data[25]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[25] = (
+                f"=ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=5000;0;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=50000;40;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=100000;75;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=250000;180;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=500000;350;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=1000000;700;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=2500000;1750;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=5000000;3500;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=10000000;6900;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=25000000;(F{current_row}*E{current_row})*AF{current_row}*0,68;"
+                f"ЕСЛИ((F{current_row}*E{current_row})*AF{current_row}<=50000000;(F{current_row}*E{current_row})*AF{current_row}*0,65;"
+                f"(F{current_row}*E{current_row})*AF{current_row}*0,57)))))))))))"
+            )
+
+            # --- ОБРАБОТКА СТОЛБЦА AA (Индекс 26) ---
+            if len(row_data) > 26 and isinstance(row_data[26], str) and "ITOGO_1" in row_data[26]:
+                # Формируем формулу с подстановкой номера текущей строки
+                row_data[26] = (f'=ЕСЛИ(C{current_row}="покупка",'f'ЕСЛИ(T{current_row}="",0,'
+                                               f'(T{current_row}*U{current_row}-T{current_row}*U{current_row}*0.0005-'
+                                               f'ЕСЛИ(F{current_row}<T{current_row},(T{current_row}*U{current_row}-F{current_row}*U{current_row})*0.13,0)'
+                                               f'-(F{current_row}*U{current_row}+F{current_row}*U{current_row}*0.0005))),'
+                                               f'ЕСЛИ(T{current_row}="",0,'
+                                               f'((F{current_row}*U{current_row}-F{current_row}*U{current_row}*0.0005)'
+                                               f'-(T{current_row}*U{current_row}+T{current_row}*U{current_row}*0.0005)'
+                                               f'-ЕСЛИ(T{current_row}<F{current_row},(F{current_row}*U{current_row}-T{current_row}*U{current_row})*0.13,0))))'
+                                               )
     # 4. Отправляем обновленные данные в таблицу
     response = gs.appendRangeValues_vstavka_strok(
         range=diapozon_dannich,
