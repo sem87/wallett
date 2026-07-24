@@ -789,11 +789,7 @@ async def handle_table4_data_basic(message: Message, state: FSMContext):
         await state.clear()  # Выходим из состояния
     except Exception as e:
         logi.err.info(f"handle_table4_data_basic() в папке handlers/handler_message.py , Exception as e : {e}")
-
-
 #   ----------------КОНЕЦ СОСТОЯНИЯ СОСТАВ ПОРТФЕЛЯ---------------------
-
-
 #   ----------------НАЧАЛО СОСТОЯНИЯ ДДС-------------------------
 @handler_message_router.message(F.text == "ДДС")
 async def dds_btn(message: types.Message):
@@ -839,7 +835,6 @@ async def dds_btn(message: types.Message):
         f"💰Средний доход в мес: {format_money(monthly_income)} ₽\n"
         f"📈Средние затраты в мес: {format_money(monthly_expenses)} ₽\n"
     )
-
     # Анализ кассового разрыва
 
     if int(dds_kassa) < 5000:
@@ -870,8 +865,6 @@ async def dds_btn(message: types.Message):
         await message.answer(
             "🟢 КАССОВЫЙ РАЗРЫВ ОТСУТСТВУЕТ!\nВсе платежи покрыты.\n👍", reply_markup=inlinebtn.dds_btn_detail()
         )
-
-
 #   ----------------КОНЕЦ СОСТОЯНИЯ ДДС-------------------------
 #   ----------------НАЧАЛО СОСТОЯНИЯ PNL-------------------------
 @handler_message_router.message(F.text == "PNL")
@@ -996,12 +989,8 @@ async def balans_btn(message: types.Message):
             "✅✅✅ Увеличился собственный капитал больше 0!\nНУЖНО РАЗОБРАТСЯ В ВЫВОДАХ\n👍",
             reply_markup=inlinebtn.balance_btn_detail(),
         )
-
-
 #   ----------------КОНЕЦ СОСТОЯНИЯ БАЛАНС-------------------------
 #   ----------------НАЧАЛО СОСТОЯНИЯ УДАЛИТЬ ДЕЛО------------------
-
-
 # Команда /d — удалить дело по номеру строки
 # входим в состояние
 @handler_message_router.message(F.text == "/d")
