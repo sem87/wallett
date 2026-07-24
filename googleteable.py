@@ -417,7 +417,47 @@ def Dobavlenie_vstavka_strok(Nazvanie_operazii, diapozon_dannich, znachenie):
                 f'=ЕСЛИОШИБКА(ЕСЛИ(AD{current_row}="ошибка кол-ва","ошибка кол-ва",'f'ЕСЛИ(C{current_row}="покупка",'
                 f'(F{current_row}*(U{current_row}+W{current_row}+Y{current_row})-AD{current_row})*1.00093/(U{current_row}+W{current_row}+Y{current_row}),'
                 f'(F{current_row}*(U{current_row}+W{current_row}+Y{current_row})+AD{current_row})*1.00093/(U{current_row}+W{current_row}+Y{current_row}))))'
+            )
+        # --- ОБРАБОТКА СТОЛБЦА AF (Индекс 31) ---
+        if len(row_data) > 31 and isinstance(row_data[31], str) and "DNEY" in row_data[31]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[31] = f"=AH{current_row}-D{current_row}"
+
+        # --- ОБРАБОТКА СТОЛБЦА AG (Индекс 32) ---
+        if len(row_data) > 32 and isinstance(row_data[32], str) and "PROZENT" in row_data[32]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[32] = f"=ЕСЛИОШИБКА((AD{current_row}/(E{current_row}*F{current_row}))*100)"
+
+        # --- ОБРАБОТКА СТОЛБЦА AH (Индекс 33) --- это дата
+        # --- ОБРАБОТКА СТОЛБЦА AI (Индекс 34) ---
+        if len(row_data) > 34 and isinstance(row_data[34], str) and "REZULTAT" in row_data[34]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[34] = (
+                f'=ЕСЛИ(AD{current_row}="ошибка кол-ва","ошибка кол-ва",'f'ЕСЛИ(E{current_row}>U{current_row}+W{current_row}+Y{current_row},"процес",'
+                f'ЕСЛИ(AD{current_row}>0,"заработок","убыток")))'
                 )
+
+        # # --- ОБРАБОТКА СТОЛБЦА AJ (Индекс 35) ---
+        # if len(row_data) > 35 and isinstance(row_data[35], str) and "NA_VLOZENII_RUBL" in row_data[35]:
+        #     # Формируем формулу с подстановкой номера текущей строки
+        #     row_data[35] = нету
+
+        # --- ОБРАБОТКА СТОЛБЦА AK (Индекс 36) ---
+        if len(row_data) > 36 and isinstance(row_data[36], str) and "KOMMISSIA_POKUPKA" in row_data[36]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[36] = f"=F{current_row}*E{current_row}*0.0005"
+
+        # --- ОБРАБОТКА СТОЛБЦА AL (Индекс 37) ---
+        if len(row_data) > 37 and isinstance(row_data[37], str) and "KOMMISSIA_PRODAZA" in row_data[37]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[
+                37] = f"=(T{current_row}*U{current_row}+V{current_row}*W{current_row}+X{current_row}*Y{current_row})*0.0005"
+
+        # --- ОБРАБОТКА СТОЛБЦА AM (Индекс 38) ---
+        if len(row_data) > 38 and isinstance(row_data[38], str) and "SCHET_UBITKI" in row_data[38]:
+            # Формируем формулу с подстановкой номера текущей строки
+            row_data[
+                38] = f'=ЕСЛИ(AI{current_row}="убыток",'f' ЕСЛИ(AM{current_row - 1}="", 1, AM{current_row - 1}+1),'f' 0)'
 
     # 4. Отправляем обновленные данные в таблицу
     response = gs.appendRangeValues_vstavka_strok(

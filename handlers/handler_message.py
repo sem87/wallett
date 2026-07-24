@@ -15,6 +15,7 @@ from pydant import pydantic_models
 from states import UserData  # ← Чистый и понятный импорт
 from utils import is_admin
 import time
+
 # from databazesql import databaze_sql_term
 
 handler_message_router = Router()
@@ -511,12 +512,6 @@ async def process_m_price(message: Message, state: FSMContext):
                                          attendant=attendant, volume=volume, cup=cup, pattern=pattern,
                                          conclusion=conclusion, final_conclusion=final_conclusion)
 
-
-
-
-
-
-
         # Запись в Google Таблицы
         plan_deistvi_m_basic = [
             [m_basic.tiker,
@@ -545,19 +540,24 @@ async def process_m_price(message: Message, state: FSMContext):
              "",
              "",
              "COST_PLECHO",
-             "ITOGO_1"]
+             "ITOGO_1",
+             "ITOGO_2",
+             "ITOGO_3",
+             "ITOGO",
+             "PREDBEZYBITOK",
+             "DNEY",
+             "PROZENT",
+             date_str,
+             "REZULTAT",
+             0,
+             "KOMMISSIA_POKUPKA",
+             "KOMMISSIA_PRODAZA",
+             "SCHET_UBITKI"
+             ]
         ]
-
-
-
-
 
         # Dobavlenie(Nazvanie_operazii="", diapozon_dannich="молния!A5", znachenie=plan_deistvi_m_basic)
         Dobavlenie_vstavka_strok(Nazvanie_operazii="", diapozon_dannich="молния!A5", znachenie=plan_deistvi_m_basic)
-
-
-
-
 
         # Отправка ответов пользователю
         response_text = (
@@ -1052,12 +1052,13 @@ async def do_list(message: types.Message):
         # artificial_intelligence = Read(Nazvanie_operazii="", range=f"Дела и управление!F{random_string}")[0]
         kategoria = Read(Nazvanie_operazii="", range=f"Дела и управление!G{random_string}")[0]
         prozent_vipolnenia = Read(Nazvanie_operazii="", range=f"Дела и управление!K{random_string}")[0]
-        if prozent_vipolnenia=="100%":
+        if prozent_vipolnenia == "100%":
             await message.answer(f"ЗАДАНИЕ ВЫПОЛНЕНО !!!")
             await message.answer(f"{tasks}\n")
             await message.answer(f"МОЛОДЕЦ !!!")
         else:
-            await message.answer(f"⚙️ДЕЛА РАНДОМНО⚙️\nСтрока {random_string}\n{kategoria}\nПроцент выполненого {prozent_vipolnenia}")
+            await message.answer(
+                f"⚙️ДЕЛА РАНДОМНО⚙️\nСтрока {random_string}\n{kategoria}\nПроцент выполненого {prozent_vipolnenia}")
             await message.answer(f"{tasks}\n")
             # await message.answer(f"{artificial_intelligence}\n")
             dead_line_datetime = datetime.strptime(dead_line, "%Y-%m-%d")
