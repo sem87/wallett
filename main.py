@@ -6,7 +6,7 @@ from handlers.start import router as start_router
 from handlers.handler_message import handler_message_router as h_m_router
 from handlers import callbackdata
 from logi import logi
-# Это просто проверка
+# Это просто проверка tuytyty
 # Загружаем .env только если файл существует (локально)
 if os.path.exists(".env.wallet"):
     load_dotenv(".env.wallet")

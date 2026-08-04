@@ -15,7 +15,7 @@ from pydant import pydantic_models
 from states import UserData  # ← Чистый и понятный импорт
 from utils import is_admin
 import time
-
+from raschet_ATR import get_atr_for_ticker
 # from databazesql import databaze_sql_term
 
 handler_message_router = Router()
@@ -474,22 +474,27 @@ async def process_m_price(message: Message, state: FSMContext):
         # Прежде чем показывать расчеты нужно показать справочное сообщение
         # Нужно читать данные из гугл таблице   R:R риск келли и в зависимости от покупка или продажа нужно считать стоп
         # прочитаем из гугла
-        pecent_risk = abs((float(Read(Nazvanie_operazii="", range=f"молния!AF2")[0])) / 100)
+        # pecent_risk = abs((float(Read(Nazvanie_operazii="", range=f"молния!AF2")[0])) / 100)  это заменил znachenie_atr
+        znachenie_atr = round(get_atr_for_ticker(ticker=tiker),2)
         R_R = abs(float(Read(Nazvanie_operazii="", range=f"молния!AC2")[0]))
+        mnozitel_atr = 2
+        # Расстояние до стопа
+        rasstoanie_do_stop =znachenie_atr*mnozitel_atr
+
         # print(f"&&&&&&&&&&&&&&&&&&&&&{pecent_risk}$$$$$$$$$$$$$${R_R}")
         # тогда расчет стопов на покупку
         if btn_buy_sell == "покупка":
-            stop_market = round(price_float * (1 - pecent_risk), 2)
+            stop_market = round(price_float  - rasstoanie_do_stop, 2)
             stop_market_0 = round(price_float * 1.001, 2)
-            take_profit = round(price_float * (1 + pecent_risk * R_R), 2)
+            take_profit = round(price_float + rasstoanie_do_stop * R_R, 2)
         # тогда расчет стопов на продажу
         elif btn_buy_sell == "продажа":
             # Стоп-лосс: цена идет ВВЕРХ (против нас), поэтому прибавляем риск
-            stop_market = round(price_float * (1 + pecent_risk), 2)
+            stop_market = round(price_float + rasstoanie_do_stop, 2)
             # Начальный стоп/триггер: цена идет ВНИЗ (в нашу сторону), поэтому убавляем
             stop_market_0 = round(price_float * 0.999, 2)
             # Тейк-профит: цена идет ВНИЗ (в нашу сторону), поэтому вычитаем риск * R_R
-            take_profit = round(price_float * (1 - pecent_risk * R_R), 2)
+            take_profit = round(price_float - rasstoanie_do_stop * R_R, 2)
         # выяснить может быть делать после пайдентик
         # print(f"{stop_market}$$$$$$${stop_market_0}$$$$$$$$${take_profit}")
 

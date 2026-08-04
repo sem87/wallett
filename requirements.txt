@@ -13,3 +13,6 @@ huggingface_hub == 1.4.1
 pytest == 9.0.2
 SQLAlchemy == 2.0.44
 aiohttp_socks==0.8.4
+#pip show aiogram
+numpy==2.5.1
+pandas==3.0.5
