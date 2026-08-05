@@ -474,6 +474,7 @@ async def process_m_price(message: Message, state: FSMContext):
         # Прежде чем показывать расчеты нужно показать справочное сообщение
         # Нужно читать данные из гугл таблице   R:R риск келли и в зависимости от покупка или продажа нужно считать стоп
         # прочитаем из гугла
+        # =============пока пытаюсь работать через ATR и коэффициент 2
         # pecent_risk = abs((float(Read(Nazvanie_operazii="", range=f"молния!AF2")[0])) / 100)  это заменил znachenie_atr
         znachenie_atr = round(get_atr_for_ticker(ticker=tiker),2)
         R_R = abs(float(Read(Nazvanie_operazii="", range=f"молния!AC2")[0]))
