@@ -127,8 +127,8 @@ def get_atr_for_ticker(ticker="SBER"):
     df['atr'] = df['tr'].ewm(alpha=1 / period, adjust=False).mean()
     # 5. Практическое применение: расчет стопа для последней свечи
     last = df.iloc[-1]
-    current_price = last['close']
-    print(current_price)
+    # current_price = last['close']
+    # print(current_price)
     current_atr = last['atr']
     return current_atr
 
