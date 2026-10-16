@@ -109,3 +109,14 @@ def input_btn_volume():
     keyboard_builder.button(text="огромный", callback_data="volume_super")
     keyboard_builder.adjust(2,2)
     return keyboard_builder.as_markup()
+
+def docker_btn():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="cuber pull/up", callback_data="docker_1")
+    keyboard_builder.button(text="cuber down", callback_data="docker_2")
+    keyboard_builder.button(text="wallet docker_pull/up", callback_data="docker_3")
+    keyboard_builder.button(text="wallet down", callback_data="docker_4")
+    keyboard_builder.button(text="news docker_pull/up", callback_data="docker_5")
+    keyboard_builder.button(text="news down", callback_data="docker_6")
+    keyboard_builder.adjust(2,2,2)
+    return keyboard_builder.as_markup()

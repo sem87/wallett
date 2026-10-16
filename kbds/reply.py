@@ -11,7 +11,7 @@ start_kb = ReplyKeyboardMarkup(
             KeyboardButton(text="💼состав💼/c"),
         ],
         [
-            KeyboardButton(text="⚙️ДЕЛА⚙️/d"),
+            KeyboardButton(text="⚙️ДЕЛА⚙️/d"),KeyboardButton(text="docker")
         ],
     ],
     # is_persistent=True,

@@ -9,10 +9,10 @@ google-auth-oauthlib == 1.2.0
 python-dotenv == 1.0.1
 # AI Models & APIs
 dashscope ==  1.25.12
-huggingface_hub == 1.4.1
+huggingface_hub>=0.24.0
 pytest == 9.0.2
 SQLAlchemy == 2.0.44
 aiohttp_socks==0.8.4
 #pip show aiogram
-numpy==2.5.1
-pandas==3.0.5
+numpy>=2.0.0
+pandas>=2.2.0

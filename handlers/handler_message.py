@@ -1081,6 +1081,21 @@ async def do_list(message: types.Message):
 
 
 #   ----------------КОНЕЦ ДЕЛА------------------------
+#   ----------------НАЧАЛО docker------------------------------------
+@handler_message_router.message(F.text == "docker")
+async def do_docker(message: types.Message):
+    try:
+        if not is_admin(message.from_user.id):
+            await message.delete()
+            return
+        await message.answer("Работа с docker")
+        await message.answer("pull/up - контейнер останавливаем -> скачиваем -> поднимаем")
+        await message.answer("down - контейнер просто останавливаем ", reply_markup=inlinebtn.docker_btn())
+
+    except Exception as e:
+        logi.err.info(f"do_docker() в папке handlers/handler_message.py , Exception as e : {e}")
+
+#   ----------------КОНЕЦ docker------------------------
 #   ----------------НАЧАЛО ЗАПИСЬ ДЕЛА-----------------
 @handler_message_router.message()
 async def management(message: types.Message):
