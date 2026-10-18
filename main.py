@@ -47,10 +47,7 @@
 #         logi.err.info("sem87sem робот ОСТАНОВЛЕН В РУЧНУЮ")
 #     except Exception as e:
 #         logi.err.info(f"main , Exception as e : {e}")
-
-
-
-
+# ЭТО ПОКА СТАРЫЙ ВАРИАНТ  НО ПО ФАКТУ ИЗМЕНИЛИ 22 СТРОКУ
 # ========================================
 import os
 import asyncio
