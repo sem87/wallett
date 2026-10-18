@@ -1,7 +1,7 @@
 # handlers/callbackdata.py
 
 from datetime import datetime
-
+import asyncio
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
@@ -670,3 +670,34 @@ async def direction_btn_sell(callback: CallbackQuery, state: FSMContext):
     except Exception as e:
         logi.err.info(f"direction_btn_sell() в папке handlers/callbackdata, Exception as e: {e}")
 # ---------------------КОНЕЦ КНОПОК ДЛЯ покупка/продажа-----------------
+# ---------------------НАЧАЛО КНОПОК ДЛЯ docker----------------
+@callback_router.callback_query(F.data == "cuber_docker_1")
+async def cuber_docker_1_btn(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки cuber pull/up"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Нажал cuber pull/up", show_alert=False)
+        await callback.message.answer("контейнер cuber останавливаем -> скачиваем -> поднимаем")
+        # ================== ЗАПУСК СКРИПТА ==================
+        # Укажите правильный путь к скрипту и команду (python или python3)
+        process = await asyncio.create_subprocess_exec(
+            'python3', 'scripts/cuber_update.py',  # замените на ваш путь
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        if process.returncode == 0:
+            await callback.message.answer(
+                f"✅ Скрипт выполнен успешно.\n"
+                f"Вывод: {stdout.decode('utf-8')[:1000]}"  # Ограничение длины сообщения
+            )
+        else:
+            await callback.message.answer(
+                f"❌ Ошибка выполнения скрипта.\n"
+                f"Лог ошибки: {stderr.decode('utf-8')[:1000]}"
+            )
+        # ====================================================
+    except Exception as e:
+        logi.err.info(f"cuber_docker_1_btn() в папке handlers/callbackdata, Exception as e: {e}")
+
+# ---------------------КОНЕЦ КНОПОК ДЛЯ docker-----------------
