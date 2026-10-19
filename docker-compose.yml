@@ -20,6 +20,7 @@ services:
       - ./data:/app/data
       # 🗄️ БАЗА ДАННЫХ — добавляем эту строку:
       - ../terminator:/terminator  # ← Ключевая строка!
+      - ../scripts:/app/scripts
 
     # 🔐 Переменные окружения (можно продублировать из .env.wallet)
     environment:

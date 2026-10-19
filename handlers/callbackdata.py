@@ -13,7 +13,7 @@ from handlers.handler_message import process_m_trend_days, process_m_trend_hour,
     process_m_btn_buy_sell
 # from wallett.kbds.inlinebtn import terminator_variety, lightning  # явный импорт нужных функций
 from utils import is_admin
-
+from pathlib import Path
 callback_router = Router()
 
 
@@ -680,8 +680,9 @@ async def cuber_docker_1_btn(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("контейнер cuber останавливаем -> скачиваем -> поднимаем")
         # ================== ЗАПУСК СКРИПТА ==================
         # Укажите правильный путь к скрипту и команду (python или python3)
+        script_path = Path(__file__).parent / 'scripts' / 'cuber_pull_up.py'
         process = await asyncio.create_subprocess_exec(
-            'python3', 'scripts/cuber_update.py',  # замените на ваш путь
+            'python3', str(script_path),  # замените на ваш путь
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -700,4 +701,154 @@ async def cuber_docker_1_btn(callback: CallbackQuery, state: FSMContext):
     except Exception as e:
         logi.err.info(f"cuber_docker_1_btn() в папке handlers/callbackdata, Exception as e: {e}")
 
+@callback_router.callback_query(F.data == "cuber_docker_2")
+async def cuber_docker_2_btn(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки cuber down"""
+    try:
+        # ✅ Подтверждение нажатия
+        await callback.answer("Нажал cuber down", show_alert=False)
+        await callback.message.answer("контейнер cuber останавливаем")
+        # ================== ЗАПУСК СКРИПТА ==================
+        # Укажите правильный путь к скрипту и команду (python или python3)
+        script_path = Path(__file__).parent / 'scripts' / 'cuber_down.py'
+        process = await asyncio.create_subprocess_exec(
+            'python3', str(script_path),  # замените на ваш путь
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        if process.returncode == 0:
+            await callback.message.answer(
+                f"✅ Скрипт выполнен успешно.\n"
+                f"Вывод: {stdout.decode('utf-8')[:100]}"  # Ограничение длины сообщения
+            )
+        else:
+            await callback.message.answer(
+                f"❌ Ошибка выполнения скрипта.\n"
+                f"Лог ошибки: {stderr.decode('utf-8')[:1000]}"
+            )
+        # ====================================================
+    except Exception as e:
+        logi.err.info(f"cuber_docker_2_btn() в папке handlers/callbackdata, Exception as e: {e}")
+
+
+@callback_router.callback_query(F.data == "wallet_docker_3")
+async def wallet_docker_3_btn(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки wallet pull/up"""
+    try:
+        # Подтверждение нажатия
+        await callback.answer("Нажал wallet pull/up", show_alert=False)
+        await callback.message.answer("контейнер wallet останавливаем -> скачиваем -> поднимаем")
+        # ================== ЗАПУСК СКРИПТА ==================
+        # Укажите правильный путь к скрипту и команду (python или python3)
+        script_path = Path(__file__).parent / 'scripts' / 'wallet_pull_up.py'
+        process = await asyncio.create_subprocess_exec(
+            'python3', str(script_path),  # замените на ваш путь
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        if process.returncode == 0:
+            await callback.message.answer(
+                f"✅ Скрипт выполнен успешно.\n"
+                f"Вывод: {stdout.decode('utf-8')[:100]}"  # Ограничение длины сообщения
+            )
+        else:
+            await callback.message.answer(
+                f"❌ Ошибка выполнения скрипта.\n"
+                f"Лог ошибки: {stderr.decode('utf-8')[:1000]}"
+            )
+        # ====================================================
+    except Exception as e:
+        logi.err.info(f"wallet_docker_3_btn() в папке handlers/callbackdata, Exception as e: {e}")
+
+@callback_router.callback_query(F.data == "wallet_docker_4")
+async def wallet_docker_4_btn(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки wallet down"""
+    try:
+        # Подтверждение нажатия
+        await callback.answer("Нажал wallet down", show_alert=False)
+        await callback.message.answer("контейнер wallet останавливаем")
+        # ================== ЗАПУСК СКРИПТА ==================
+        # Укажите правильный путь к скрипту и команду (python или python3)
+        script_path = Path(__file__).parent / 'scripts' / 'wallet_down.py'
+        process = await asyncio.create_subprocess_exec(
+            'python3', str(script_path),  # замените на ваш путь
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        if process.returncode == 0:
+            await callback.message.answer(
+                f"✅ Скрипт выполнен успешно.\n"
+                f"Вывод: {stdout.decode('utf-8')[:100]}"  # Ограничение длины сообщения
+            )
+        else:
+            await callback.message.answer(
+                f"❌ Ошибка выполнения скрипта.\n"
+                f"Лог ошибки: {stderr.decode('utf-8')[:1000]}"
+            )
+        # ====================================================
+    except Exception as e:
+        logi.err.info(f"wallet_docker_4_btn() в папке handlers/callbackdata, Exception as e: {e}")
+
+@callback_router.callback_query(F.data == "news_docker_5")
+async def news_docker_5_btn(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки news pull/up"""
+    try:
+        # Подтверждение нажатия
+        await callback.answer("Нажал news pull/up", show_alert=False)
+        await callback.message.answer("контейнер news останавливаем -> скачиваем -> поднимаем")
+        # ================== ЗАПУСК СКРИПТА ==================
+        # Укажите правильный путь к скрипту и команду (python или python3)
+        script_path = Path(__file__).parent / 'scripts' / 'news_pull_up.py'
+        process = await asyncio.create_subprocess_exec(
+            'python3', str(script_path),  # замените на ваш путь
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        if process.returncode == 0:
+            await callback.message.answer(
+                f"✅ Скрипт выполнен успешно.\n"
+                f"Вывод: {stdout.decode('utf-8')[:100]}"  # Ограничение длины сообщения
+            )
+        else:
+            await callback.message.answer(
+                f"❌ Ошибка выполнения скрипта.\n"
+                f"Лог ошибки: {stderr.decode('utf-8')[:1000]}"
+            )
+        # ====================================================
+    except Exception as e:
+        logi.err.info(f"news_docker_5_btn() в папке handlers/callbackdata, Exception as e: {e}")
+
+@callback_router.callback_query(F.data == "news_docker_6")
+async def news_docker_6_btn(callback: CallbackQuery, state: FSMContext):
+    """Обработчик кнопки news down"""
+    try:
+        # Подтверждение нажатия
+        await callback.answer("Нажал news down", show_alert=False)
+        await callback.message.answer("контейнер news останавливаем")
+        # ================== ЗАПУСК СКРИПТА ==================
+        # Укажите правильный путь к скрипту и команду (python или python3)
+        script_path = Path(__file__).parent / 'scripts' / 'news_down.py'
+        process = await asyncio.create_subprocess_exec(
+            'python3', str(script_path),  # замените на ваш путь
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        if process.returncode == 0:
+            await callback.message.answer(
+                f"✅ Скрипт выполнен успешно.\n"
+                f"Вывод: {stdout.decode('utf-8')[:100]}"  # Ограничение длины сообщения
+            )
+        else:
+            await callback.message.answer(
+                f"❌ Ошибка выполнения скрипта.\n"
+                f"Лог ошибки: {stderr.decode('utf-8')[:1000]}"
+            )
+        # ====================================================
+    except Exception as e:
+        logi.err.info(f"news_docker_6_btn() в папке handlers/callbackdata, Exception as e: {e}")
 # ---------------------КОНЕЦ КНОПОК ДЛЯ docker-----------------
