@@ -1,22 +1,19 @@
 #!/bin/bash
 
-# Укажи свои 3 пути
-DIRS=(
-    "/path/to/project1"
-    "/path/to/project2"
-    "/path/to/project3"
-)
+DIR="/home/sem/py/wallet"
+echo "=== $DIR ==="
+cd "$DIR" || { echo "Ошибка пути"; exit 1; }
 
-for dir in "${DIRS[@]}"; do
-    echo "=== $dir ==="
-    cd "$dir" || { echo "Ошибка пути"; continue; }
-    
-    docker compose down
-    sleep 5
-    
-    docker compose pull
-    sleep 5
-    
-    docker compose up -d
-    sleep 5
-done
+echo "⏳ Останавливаем контейнер..."
+docker-compose down
+sleep 10
+
+echo "⏳ Скачиваем актуальный образ с Docker Hub..."
+docker-compose pull
+sleep 10
+
+echo "⏳ Запускаем контейнер..."
+docker-compose up -d
+sleep 10
+
+echo "✅ ЗАВЕРШЕНО"

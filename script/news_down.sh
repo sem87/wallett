@@ -1,22 +1,10 @@
 #!/bin/bash
 
-# Укажи свои 3 пути
-DIRS=(
-    "/path/to/project1"
-    "/path/to/project2"
-    "/path/to/project3"
-)
+DIR="/home/sem/py/news"
+echo "=== $DIR ==="
+cd "$DIR" || { echo "Ошибка пути"; exit 1; }
+docker-compose down
+echo "ЗАВЕРШЕНО"
 
-for dir in "${DIRS[@]}"; do
-    echo "=== $dir ==="
-    cd "$dir" || { echo "Ошибка пути"; continue; }
-    
-    docker compose down
-    sleep 5
-    
-    docker compose pull
-    sleep 5
-    
-    docker compose up -d
-    sleep 5
-done
+# chmod +x news_down.sh   сделать исполняемым
+#    ./news_down.sh    вызвать файл

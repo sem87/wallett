@@ -1,10 +1,10 @@
 #!/bin/bash
 
-DIR="/home/sem/py/script"
+DIR="/home/sem/py/wallet"
 echo "=== $DIR ==="
 cd "$DIR" || { echo "Ошибка пути"; exit 1; }
 docker-compose down
-echo "ЗАВЕРШИНО"
+echo "ЗАВЕРШЕНО"
 
 # chmod +x wallet_down.sh   сделать исполняемым
-#    ./stop.sh    вызвать файл
+#    ./wallet_down.sh    вызвать файл
