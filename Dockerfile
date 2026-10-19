@@ -9,3 +9,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD python -c "print('OK')" || exit 1
 # Запуск скрипта
 CMD ["python", "main.py"]
+
+# RUN apt-get update && apt-get install -y docker.io docker-compose-plugin   для управления скриптами
+
+

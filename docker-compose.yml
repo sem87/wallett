@@ -21,7 +21,7 @@ services:
       # 🗄️ БАЗА ДАННЫХ — добавляем эту строку:
       - ../terminator:/terminator  # ← Ключевая строка!
       - ../scripts:/app/scripts
-
+      # - /var/run/docker.sock:/var/run/docker.sock  # <-- ОБЯЗАТЕЛЬНО Добавь сокет в docker-compose.yml твоего бота
     # 🔐 Переменные окружения (можно продублировать из .env.wallet)
     environment:
       - PYTHONPATH=/app

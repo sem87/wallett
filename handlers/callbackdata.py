@@ -638,7 +638,6 @@ async def direction_volume_super(callback: CallbackQuery, state: FSMContext):
     except Exception as e:
         logi.err.info(f"direction_volume_super() в папке handlers/callbackdata, Exception as e: {e}")
 
-
 # ---------------------КОНЕЦ КНОПОК ДЛЯ объем-----------------
 # ---------------------НАЧАЛО КНОПОК ДЛЯ покупка/продажа----------------
 @callback_router.callback_query(F.data == "btn_buy")
@@ -675,14 +674,14 @@ async def direction_btn_sell(callback: CallbackQuery, state: FSMContext):
 async def cuber_docker_1_btn(callback: CallbackQuery, state: FSMContext):
     """Обработчик кнопки cuber pull/up"""
     try:
-        # ✅ Подтверждение нажатия
+        # Подтверждение нажатия
         await callback.answer("Нажал cuber pull/up", show_alert=False)
         await callback.message.answer("контейнер cuber останавливаем -> скачиваем -> поднимаем")
         # ================== ЗАПУСК СКРИПТА ==================
         # Укажите правильный путь к скрипту и команду (python или python3)
-        script_path = Path(__file__).parent / 'scripts' / 'cuber_pull_up.py'
+        script_path = Path(__file__).parent / 'scripts' / 'cuber_pull_up.sh'
         process = await asyncio.create_subprocess_exec(
-            'python3', str(script_path),  # замените на ваш путь
+            'bash', str(script_path),  # замените на ваш путь
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -690,7 +689,7 @@ async def cuber_docker_1_btn(callback: CallbackQuery, state: FSMContext):
         if process.returncode == 0:
             await callback.message.answer(
                 f"✅ Скрипт выполнен успешно.\n"
-                f"Вывод: {stdout.decode('utf-8')[:1000]}"  # Ограничение длины сообщения
+                f"Вывод: {stdout.decode('utf-8')[:100]}"  # Ограничение длины сообщения
             )
         else:
             await callback.message.answer(
@@ -705,14 +704,14 @@ async def cuber_docker_1_btn(callback: CallbackQuery, state: FSMContext):
 async def cuber_docker_2_btn(callback: CallbackQuery, state: FSMContext):
     """Обработчик кнопки cuber down"""
     try:
-        # ✅ Подтверждение нажатия
+        # Подтверждение нажатия
         await callback.answer("Нажал cuber down", show_alert=False)
         await callback.message.answer("контейнер cuber останавливаем")
         # ================== ЗАПУСК СКРИПТА ==================
         # Укажите правильный путь к скрипту и команду (python или python3)
-        script_path = Path(__file__).parent / 'scripts' / 'cuber_down.py'
+        script_path = Path(__file__).parent / 'scripts' / 'cuber_down.sh'
         process = await asyncio.create_subprocess_exec(
-            'python3', str(script_path),  # замените на ваш путь
+            'bash', str(script_path),  # замените на ваш путь
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -741,9 +740,9 @@ async def wallet_docker_3_btn(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("контейнер wallet останавливаем -> скачиваем -> поднимаем")
         # ================== ЗАПУСК СКРИПТА ==================
         # Укажите правильный путь к скрипту и команду (python или python3)
-        script_path = Path(__file__).parent / 'scripts' / 'wallet_pull_up.py'
+        script_path = Path(__file__).parent / 'scripts' / 'wallet_pull_up.sh'
         process = await asyncio.create_subprocess_exec(
-            'python3', str(script_path),  # замените на ваш путь
+            'bash', str(script_path),  # замените на ваш путь
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -771,9 +770,9 @@ async def wallet_docker_4_btn(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("контейнер wallet останавливаем")
         # ================== ЗАПУСК СКРИПТА ==================
         # Укажите правильный путь к скрипту и команду (python или python3)
-        script_path = Path(__file__).parent / 'scripts' / 'wallet_down.py'
+        script_path = Path(__file__).parent / 'scripts' / 'wallet_down.sh'
         process = await asyncio.create_subprocess_exec(
-            'python3', str(script_path),  # замените на ваш путь
+            'bash', str(script_path),  # замените на ваш путь
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -801,9 +800,9 @@ async def news_docker_5_btn(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("контейнер news останавливаем -> скачиваем -> поднимаем")
         # ================== ЗАПУСК СКРИПТА ==================
         # Укажите правильный путь к скрипту и команду (python или python3)
-        script_path = Path(__file__).parent / 'scripts' / 'news_pull_up.py'
+        script_path = Path(__file__).parent / 'scripts' / 'news_pull_up.sh'
         process = await asyncio.create_subprocess_exec(
-            'python3', str(script_path),  # замените на ваш путь
+            'bash', str(script_path),  # замените на ваш путь
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -831,9 +830,9 @@ async def news_docker_6_btn(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("контейнер news останавливаем")
         # ================== ЗАПУСК СКРИПТА ==================
         # Укажите правильный путь к скрипту и команду (python или python3)
-        script_path = Path(__file__).parent / 'scripts' / 'news_down.py'
+        script_path = Path(__file__).parent / 'scripts' / 'news_down.sh'
         process = await asyncio.create_subprocess_exec(
-            'python3', str(script_path),  # замените на ваш путь
+            'bash', str(script_path),  # замените на ваш путь
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
