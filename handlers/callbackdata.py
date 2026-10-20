@@ -767,27 +767,7 @@ async def wallet_docker_4_btn(callback: CallbackQuery, state: FSMContext):
     try:
         # Подтверждение нажатия
         await callback.answer("Нажал wallet down", show_alert=False)
-        await callback.message.answer("контейнер wallet останавливаем")
-        # ================== ЗАПУСК СКРИПТА ==================
-        # Укажите правильный путь к скрипту и команду (python или python3)
-        script_path = Path(__file__).parent / 'scripts' / 'wallet_down.sh'
-        process = await asyncio.create_subprocess_exec(
-            'bash', str(script_path),  # замените на ваш путь
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
-        if process.returncode == 0:
-            await callback.message.answer(
-                f"✅ Скрипт выполнен успешно.\n"
-                f"Вывод: {stdout.decode('utf-8')[:100]}"  # Ограничение длины сообщения
-            )
-        else:
-            await callback.message.answer(
-                f"❌ Ошибка выполнения скрипта.\n"
-                f"Лог ошибки: {stderr.decode('utf-8')[:1000]}"
-            )
-        # ====================================================
+        await callback.message.answer("НЕЛЬЗЯ НАЖИМАТЬ DOWN!!!!!!!!!!!!!")
     except Exception as e:
         logi.err.info(f"wallet_docker_4_btn() в папке handlers/callbackdata, Exception as e: {e}")
 
