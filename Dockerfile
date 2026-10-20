@@ -35,11 +35,13 @@ CMD ["python", "main.py"]
 
 
 # RUN apt-get update && apt-get install -y docker.io docker-compose-plugin   для управления скриптами
-# СТРОИМ ИЕЙДЖ
+# СТРОИМ ИМЕЙДЖ
 # docker build --no-cache \
 #   --build-arg HTTP_PROXY="http://yUBkUP:xUoCe5@186.179.61.140:9768" \
 #   --build-arg HTTPS_PROXY="http://yUBkUP:xUoCe5@186.179.61.140:9768" \
 #   -t sem87sem/wallett:latest .
+# Повершелл
+# docker build --no-cache --build-arg HTTP_PROXY="http://yUBkUP:xUoCe5@186.179.61.140:9768" --build-arg HTTPS_PROXY="http://yUBkUP:xUoCe5@186.179.61.140:9768" -t sem87sem/wallett:latest .
 # ПУШИМ В ДОКЕР ХАБ
 # docker push sem87sem/wallett:latest
 
